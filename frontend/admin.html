@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Analytics - Digital Street</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body style="background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);">
+    <div id="app" class="app-container" style="max-width: 900px;">
+        
+        <!-- Admin Header -->
+        <header class="app-header glass-panel" style="flex-direction: row; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--accent-purple);">
+            <div class="header-logo">
+                <i data-lucide="shield-check" style="color: var(--accent-purple);"></i>
+                <h1 style="background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Admin Control Center</h1>
+            </div>
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                <i data-lucide="home"></i> Exit to Home
+            </button>
+        </header>
+
+        <main style="display: flex; flex-direction: column; gap: 2rem; padding-top: 2rem;">
+            
+            <!-- Overall Stats -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--accent-green);">
+                    <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Total Platform Revenue</div>
+                    <div id="admin-total-income" style="font-size: 2.5rem; font-weight: 800; color: var(--accent-green);">₹0.00</div>
+                </div>
+                <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--accent-blue);">
+                    <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Total Orders Processed</div>
+                    <div id="admin-total-sold" style="font-size: 2.5rem; font-weight: 800; color: var(--accent-blue);">0</div>
+                </div>
+            </div>
+
+            <!-- Customer Management -->
+            <section class="glass-panel" style="padding: 1.5rem;">
+                <h2 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="users" style="color: var(--accent-blue);"></i> Customer Database</h2>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="color: var(--text-secondary); border-bottom: 1px solid var(--panel-border);">
+                                <th style="padding: 1rem;">Customer Name</th>
+                                <th style="padding: 1rem;">Wallet Balance</th>
+                                <th style="padding: 1rem;">Total Spent</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-customers-table">
+                            <!-- Rows via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Vendor Management -->
+            <section class="glass-panel" style="padding: 1.5rem;">
+                <h2 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="store" style="color: var(--accent-green);"></i> Registered Vendors</h2>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="color: var(--text-secondary); border-bottom: 1px solid var(--panel-border);">
+                                <th style="padding: 1rem;">Shop Name</th>
+                                <th style="padding: 1rem;">Contact / Phone</th>
+                                <th style="padding: 1rem;">Income Generated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-vendors-table">
+                            <!-- Rows via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="./firebase-config.js"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="./script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            window.APP_MODE = 'ADMIN';
+            initApp();
+        });
+    </script>
+</body>
+</html>

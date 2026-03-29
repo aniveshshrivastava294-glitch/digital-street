@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Street - Welcome</title>
+    <meta name="description" content="Login or Sign Up for Digital Street Marketplace.">
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/lucide@latest">
+    <style>
+        .auth-tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; justify-content: center; }
+        .auth-tab { cursor: pointer; padding: 0.5rem 1rem; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 600; transition: all 0.3s; }
+        .auth-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+        .auth-form { display: none; flex-direction: column; gap: 1rem; }
+        .auth-form.active { display: flex; }
+        .input-group { display: flex; flex-direction: column; gap: 0.25rem; }
+        .input-group label { font-size: 0.85rem; color: var(--text-secondary); }
+        .auth-input { width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(0,0,0,0.2); color: white; outline: none; transition: 0.3s; }
+        .auth-input:focus { border-color: var(--accent-blue); }
+        .role-selector { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .role-btn { flex: 1; padding: 0.5rem; border: 1px solid var(--panel-border); border-radius: 6px; background: rgba(0,0,0,0.2); color: var(--text-secondary); cursor: pointer; transition: 0.3s; text-align: center; font-size: 0.85rem; }
+        .role-btn.active { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+        .vendor-fields { display: none; flex-direction: column; gap: 1rem; }
+        .vendor-fields.active { display: flex; }
+    </style>
+</head>
+<body class="login-body">
+    <div class="login-container glass-panel" style="max-width: 450px;">
+        <div class="login-header">
+            <i data-lucide="store" class="logo-icon-large"></i>
+            <h1>Digital Street</h1>
+            <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Connecting your neighborhood with fresh goods.</p>
+        </div>
+        
+        <div class="auth-tabs">
+            <div class="auth-tab active" onclick="switchAuth('login')">Login</div>
+            <div class="auth-tab" onclick="switchAuth('signup')">Sign Up</div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form active" onsubmit="handleAuth(event, 'login')">
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="login-email" class="auth-input" placeholder="alex@example.com" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="login-password" class="auth-input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="primary-btn huge-btn" style="margin-top: 0.5rem;">Enter the Street</button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signup-form" class="auth-form" onsubmit="handleAuth(event, 'signup')">
+            <div class="role-selector">
+                <div id="role-customer" class="role-btn active" onclick="switchRole('CUSTOMER')">Customer</div>
+                <div id="role-vendor" class="role-btn" onclick="switchRole('VENDOR')">Vendor</div>
+            </div>
+            <input type="hidden" id="signup-role" value="CUSTOMER">
+            
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="signup-name" class="auth-input" placeholder="Alex Smith" required>
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="signup-email" class="auth-input" placeholder="alex@example.com" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="signup-password" class="auth-input" placeholder="Minimum 6 characters" required>
+            </div>
+            
+            <!-- Vendor Specific Fields -->
+            <div id="vendor-fields" class="vendor-fields">
+                <div class="input-group">
+                    <label>Shop Name</label>
+                    <input type="text" id="signup-shopname" class="auth-input" placeholder="Golden Grain Bakery">
+                </div>
+                <div class="input-group">
+                    <label>Contact Number (for customers)</label>
+                    <input type="tel" id="signup-phone" class="auth-input" placeholder="+91 98XXX XXXXX">
+                </div>
+            </div>
+
+            <button type="submit" class="primary-btn huge-btn" style="margin-top: 0.5rem; background: var(--accent-blue);">Create Account</button>
+        </form>
+
+        <div class="login-divider"></div>
+        
+        <div style="text-align: center;">
+            <a href="#" onclick="promptAdminLogin(event)" style="color: var(--text-secondary); font-size: 0.8rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                <i data-lucide="shield" style="width: 12px; height: 12px;"></i> Admin Access
+            </a>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs (Compat Mode) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase Configuration & Initialization -->
+    <script src="./firebase-config.js"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            // Check if user is already logged in
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    // Fetch user role from Firestore to redirect correctly
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        localStorage.setItem('digitalStreetSession', JSON.stringify({ ...userData, uid: user.uid }));
+                        if (userData.role === 'CUSTOMER') window.location.href = 'customer.html';
+                        else window.location.href = 'vendor.html';
+                    }
+                }
+            });
+        });
+
+        function switchAuth(type) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (type === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('login-form').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('signup-form').classList.add('active');
+            }
+        }
+
+        function switchRole(role) {
+            document.getElementById('role-customer').classList.toggle('active', role === 'CUSTOMER');
+            document.getElementById('role-vendor').classList.toggle('active', role === 'VENDOR');
+            document.getElementById('signup-role').value = role;
+            document.getElementById('vendor-fields').classList.toggle('active', role === 'VENDOR');
+            document.getElementById('signup-shopname').required = (role === 'VENDOR');
+            document.getElementById('signup-phone').required = (role === 'VENDOR');
+        }
+
+        async function handleAuth(event, type) {
+            event.preventDefault();
+            
+            if (type === 'login') {
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value.trim();
+                
+                try {
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+                    // Role redirection handled by onAuthStateChanged listener
+                } catch (e) {
+                    alert("Error logging in: " + e.message);
+                }
+            } else {
+                const name = document.getElementById('signup-name').value.trim();
+                const email = document.getElementById('signup-email').value.trim();
+                const password = document.getElementById('signup-password').value.trim();
+                const role = document.getElementById('signup-role').value;
+                const shopName = document.getElementById('signup-shopname').value.trim();
+                const phoneNumber = document.getElementById('signup-phone').value.trim();
+                
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+                    
+                    const userData = {
+                        uid: user.uid,
+                        name,
+                        email,
+                        role,
+                        shopName: role === 'VENDOR' ? shopName : null,
+                        phoneNumber: role === 'VENDOR' ? phoneNumber : null,
+                        walletBalance: 0,
+                        totalSpent: 0,
+                        totalGenerated: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    await db.collection('users').doc(user.uid).set(userData);
+                    // Redirect handled by onAuthStateChanged
+                } catch (e) {
+                    alert("Error creating account: " + e.message);
+                }
+            }
+        }
+        
+        function promptAdminLogin(e) {
+            e.preventDefault();
+            const pwd = prompt("Enter Administration Password:");
+            if(pwd === "Anivesh@123") {
+                window.location.href = "admin.html";
+            } else if (pwd !== null) {
+                alert("Incorrect Password.");
+            }
+        }
+    </script>
+</body>
+</html>
