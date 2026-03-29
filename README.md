@@ -1,57 +1,52 @@
-# 🏪 Digital Street Marketplace (Cloud Version)
+# 🏪 Digital Street Marketplace 
 
-Digital Street is a modern, real-time neighborhood marketplace connecting local vendors directly to their customers. This version is powered by **Firebase**, providing a global, real-time sync across all devices without needing a local server.
+Digital Street is a modern neighborhood marketplace connecting local vendors directly to their customers. This version is powered by a **Persistent Node.js Backend**, saving all your data securely to your computer without needing any cloud configuration.
 
-## 🚀 Features
+## 🚀 Key Features
 
-### 🔐 Firebase User Accounts
-*   **Mandatory Authentication**: Real Sign-up/Login powered by **Firebase Auth**.
-*   **Persistent Profiles**: Shop names, names, and contact details are stored in **Cloud Firestore**.
-*   **Secure Roles**: Automatic redirection based on Customer or Vendor roles.
+### 👤 User Account System
+*   **Persistent Login**: All user registrations are saved to `database.json`.
+*   **Role-Based Profiles**: Vendors have Shop names and Phone numbers; Customers have digital wallets.
+*   **Mandatory Authentication**: You must sign up and log in before accessing the marketplace.
 
 ### 🍱 Customer Experience
-*   **Digital E-Wallet**: Top up mock currency that persists in the cloud.
-*   **Live Marketplace**: Real-time Firestore streaming means products update **instantly** on your screen.
-*   **Direct Contact**: Every product card displays the vendor's phone number for pickup coordination.
-*   **Reservation Codes**: Secure pickup codes generated and stored in the Cloud for every purchase.
+*   **Digital E-Wallet**: Top up mock currency and buy local goods.
+*   **Direct Contact**: Vendor phone numbers are visible on every product for pickup coordination.
+*   **Real-time Sync**: The marketplace automatically refreshes every few seconds to show new items.
 
 ### 🏭 Vendor Dashboard
-*   **Cloud Inventory**: List items that are visible to all customers globally.
-*   **Real-time Timers**: When you start a baking timer, every customer sees the countdown in real-time.
-*   **Dynamic Flash Sales**: Instant 20% price drops across the platform.
+*   **Store Management**: Add/Edit products easily.
+*   **Persistent Inventory**: Your products stay listed even if you restart the server.
+*   **Batch Timers & Flash Sales**: Ready-made tools to drive neighborhood sales.
 
 ### 🛡️ Admin Vault
-*   **Cloud Analytics**: Monitor total platform revenue and global order history.
-*   **Live User Database**: Real-time tables showing everyone's spend and income.
-*   **Access Control**: Securely guarded by master password: `Anivesh@123`.
+*   **Platform Analytics**: Track total income and order history.
+*   **User Directory**: Detailed tables for Customer spending and Vendor revenue.
+*   **Security**: Guarded by master password: `Anivesh@123`.
 
 ## 🛠️ Tech Stack
 
-*   **Frontend**: Vanilla HTML5, CSS3 (Glassmorphism), Vanilla JavaScript.
-*   **Backend (Serverless)**: Firebase Authentication & Cloud Firestore.
-*   **Iconography**: Lucide-React.
-*   **Data Sync**: Firestore `onSnapshot` real-time listeners.
+*   **Frontend**: Vanilla HTML5, CSS3, JavaScript.
+*   **Backend**: Node.js + Express.
+*   **Database**: Local JSON persistence (`fs`-based).
 
 ## 🏁 Getting Started
 
-### 1. Prerequisites
-This version runs entirely in the browser. You only need a static web server.
+### 1. Run the Backend
+Open a terminal in the `backend/` folder and start the server:
+```bash
+cd backend
+node server.js
+```
+The server will create a `database.json` file to save your data.
 
-### 2. Configuration
-The project is already pre-configured with the specific **Firebase Configuration** for Digital Street. 
-
-### 3. Run the App
-Navigate to the `frontend/` folder and serve the application:
+### 2. Run the Frontend
+Open another terminal in the `frontend/` folder:
 ```bash
 cd frontend
 npx serve -l 8080
 ```
-Open `http://localhost:8080` in your browser.
-
-## 📱 Mobile Access
-Since this is cloud-powered, you can access the app from any device with an internet connection once it's deployed. For local testing:
-1.  Connect your phone to the same Wi-Fi.
-2.  Open your computer's local IP (e.g., `192.168.1.XX:8080`).
+Visit `http://localhost:8080` in your browser.
 
 ---
 

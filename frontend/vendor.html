@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/lucide@latest">
 </head>
 <body>
     <div id="app" class="app-container">
@@ -59,7 +60,7 @@
         
     </div>
 
-    <!-- Profile Modal -->
+    <!-- Profile Modal (Vendors) -->
     <div id="profile-modal" class="modal-overlay hidden">
         <div class="modal-content glass-panel" style="background: var(--bg-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -68,16 +69,16 @@
             </div>
             <div style="display: flex; flex-direction: column; gap: 1.25rem;">
                 <div class="input-group">
-                    <label>Full Name</label>
+                    <label style="color:var(--text-secondary); font-size:0.8rem;">Full Name</label>
                     <input type="text" id="profile-name" class="modal-input" />
                 </div>
                 <div id="profile-vendor-fields">
                     <div class="input-group" style="margin-bottom: 1.25rem;">
-                        <label>Shop Name</label>
+                        <label style="color:var(--text-secondary); font-size:0.8rem;">Shop Name</label>
                         <input type="text" id="profile-shopname" class="modal-input" />
                     </div>
                     <div class="input-group">
-                        <label>Contact Number (for customers)</label>
+                        <label style="color:var(--text-secondary); font-size:0.8rem;">Contact Number (for customers)</label>
                         <input type="text" id="profile-phone" class="modal-input" />
                     </div>
                 </div>
@@ -95,20 +96,16 @@
             </div>
             <div style="display: flex; flex-direction: column; gap: 1rem;">
                 <input type="text" id="new-item-name" placeholder="Item Name (e.g. Fresh Cookies)" class="modal-input" />
-                <input type="number" id="new-item-price" placeholder="Price (e.g. 5.50)" step="0.01" class="modal-input" />
+                <input type="number" id="new-item-price" placeholder="Price (e.g. 5.50)" step="0.01" class="auth-input" />
                 <button class="primary-btn huge-btn" style="background: var(--accent-green); color:black;" onclick="saveNewItem()">List Product</button>
             </div>
         </div>
     </div>
 
+    <!-- Notification Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="./firebase-config.js"></script>
-
+    <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./script.js"></script>
     <script>

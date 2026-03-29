@@ -1,160 +1,117 @@
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Main Database (In-memory for prototype)
-let storeItems = [
-    {
-        id: 1,
-        title: "Sourdough Bread",
-        vendorEmail: "farmerjohn@gmail.com",
-        vendorName: "Farmer John's Bakery",
-        vendorPhone: "+91 98765 43210",
-        price: 8.50,
-        originalPrice: 8.50,
-        status: 'IN_STOCK',
-        timerTarget: null,
-        flashSaleActive: false,
-        reservedTokens: []
-    },
-    {
-        id: 2,
-        title: "Alphonso Mangoes (Box of 4)",
-        vendorEmail: "orchardheights@gmail.com",
-        vendorName: "Orchard Heights",
-        vendorPhone: "+91 87654 32109",
-        price: 12.00,
-        originalPrice: 12.00,
-        status: 'IN_STOCK',
-        timerTarget: null,
-        flashSaleActive: false,
-        reservedTokens: []
-    }
-];
+const DB_FILE = path.join(__dirname, 'database.json');
 
-let platformMetrics = { totalIncome: 0, salesHistory: [] };
-
-// Advanced User Database Tracking
-// Mapping email -> Profile
-let users = {
-    "farmerjohn@gmail.com": { 
-        name: "Farmer John", 
-        email: "farmerjohn@gmail.com", 
-        password: "password123", 
-        role: "VENDOR", 
-        shopName: "Farmer John's Bakery", 
-        phoneNumber: "+91 98765 43210",
-        totalGenerated: 0 
-    },
-    "orchardheights@gmail.com": { 
-        name: "Orchard Heights", 
-        email: "orchardheights@gmail.com", 
-        password: "password123", 
-        role: "VENDOR", 
-        shopName: "Orchard Heights", 
-        phoneNumber: "+91 87654 32109",
-        totalGenerated: 0 
-    }
+// Initialize State from Disk or Defaults
+let state = {
+    storeItems: [
+        { id: 1, title: 'Fresh Sourdough', price: 120, originalPrice: 120, status: 'IN_STOCK', vendorName: 'Anivesh Bakery', vendorPhone: '+91 999 000 111', vendorEmail: 'anivesh@example.com', flashSaleActive: false, reservedTokens: [] },
+        { id: 2, title: 'Farm Eggs (Dozen)', price: 180, originalPrice: 180, status: 'IN_STOCK', vendorName: 'Green Meadows', vendorPhone: '+91 888 777 666', vendorEmail: 'green@example.com', flashSaleActive: false, reservedTokens: [] }
+    ],
+    platformMetrics: { totalIncome: 0, salesHistory: [] },
+    users: []
 };
 
+function loadDB() {
+    try {
+        if (fs.existsSync(DB_FILE)) {
+            const data = fs.readFileSync(DB_FILE, 'utf8');
+            state = JSON.parse(data);
+            console.log("💾 Database Loaded from Disk.");
+        }
+    } catch (e) {
+        console.error("Error loading DB", e);
+    }
+}
+
+function saveDB() {
+    try {
+        fs.writeFileSync(DB_FILE, JSON.stringify(state, null, 2), 'utf8');
+        console.log("📂 Database Saved to Disk.");
+    } catch (e) {
+        console.error("Error saving DB", e);
+    }
+}
+
+loadDB();
+
+// API Endpoints
 app.get('/api/state', (req, res) => {
-    // Break down users for the admin table
-    const customers = Object.values(users).filter(u => u.role === 'CUSTOMER');
-    const vendors = Object.values(users).filter(u => u.role === 'VENDOR');
-    
-    res.json({
-        storeItems,
-        platformMetrics,
-        customers,
-        vendors
-    });
+    const customers = state.users.filter(u => u.role === 'CUSTOMER');
+    const vendors = state.users.filter(u => u.role === 'VENDOR');
+    res.json({ ...state, customers, vendors });
 });
 
-// Registration Route
+app.post('/api/state', (req, res) => {
+    state.storeItems = req.body.storeItems;
+    state.platformMetrics = req.body.platformMetrics;
+    
+    // Update individual user stats if provided
+    if(req.body.currentUser) {
+        const uIdx = state.users.findIndex(u => u.email === req.body.currentUser.email);
+        if(uIdx !== -1) state.users[uIdx] = req.body.currentUser;
+    }
+    
+    saveDB();
+    res.json({ success: true });
+});
+
 app.post('/api/register', (req, res) => {
     const { name, email, password, role, shopName, phoneNumber } = req.body;
-    
-    if (users[email]) {
-        return res.status(400).json({ success: false, message: "Email already exists." });
+    if (state.users.find(u => u.email === email)) {
+        return res.status(400).json({ success: false, message: "User already exists." });
     }
-    
-    users[email] = {
-        name,
-        email,
-        password,
-        role,
-        shopName: role === 'VENDOR' ? shopName : null,
-        phoneNumber: role === 'VENDOR' ? phoneNumber : null,
-        walletBalance: role === 'CUSTOMER' ? 0 : 0,
-        totalSpent: role === 'CUSTOMER' ? 0 : 0,
-        totalGenerated: role === 'VENDOR' ? 0 : 0
+    const newUser = { 
+        name, email, password, role, shopName, phoneNumber,
+        walletBalance: 0, totalSpent: 0, totalGenerated: 0 
     };
-    
-    res.json({ success: true, user: users[email] });
+    state.users.push(newUser);
+    saveDB();
+    res.json({ success: true, user: newUser });
 });
 
-// Login Route
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
-    const user = users[email];
-    
-    if (user && user.password === password) {
+    const user = state.users.find(u => u.email === email && u.password === password);
+    if (user) {
         res.json({ success: true, user });
     } else {
-        res.status(401).json({ success: false, message: "Invalid email or password." });
+        res.status(401).json({ success: false, message: "Invalid Credentials." });
     }
 });
 
-// Profile Update Route
 app.post('/api/profile/update', (req, res) => {
     const { email, name, shopName, phoneNumber } = req.body;
-    const user = users[email];
-    
-    if (user) {
-        user.name = name;
-        if (user.role === 'VENDOR') {
-            user.shopName = shopName;
-            user.phoneNumber = phoneNumber;
-            
-            // Sync current items with new vendor details
-            storeItems.forEach(item => {
-                if (item.vendorEmail === email) {
-                    item.vendorName = shopName;
-                    item.vendorPhone = phoneNumber;
-                }
-            });
+    const uIdx = state.users.findIndex(u => u.email === email);
+    if (uIdx !== -1) {
+        state.users[uIdx].name = name;
+        if (state.users[uIdx].role === 'VENDOR') {
+            state.users[uIdx].shopName = shopName;
+            state.users[uIdx].phoneNumber = phoneNumber;
         }
-        res.json({ success: true, user });
+        // Update items owned by this vendor too
+        state.storeItems.forEach(item => {
+            if(item.vendorEmail === email) {
+                item.vendorName = shopName || name;
+                item.vendorPhone = phoneNumber;
+            }
+        });
+        saveDB();
+        res.json({ success: true, user: state.users[uIdx] });
     } else {
-        res.status(404).json({ success: false, message: "User not found." });
+        res.status(404).json({ success: false });
     }
-});
-
-// Primary Sync Overwrite (for simpler state-based updates)
-app.post('/api/state', (req, res) => {
-    const data = req.body;
-    
-    if(data.storeItems) storeItems = data.storeItems;
-    if(data.platformMetrics) platformMetrics = data.platformMetrics;
-    
-    // Specifically handle user wallet/spending updates from sync
-    if(data.currentUser) {
-        const user = users[data.currentUser.email];
-        if (user) {
-            user.walletBalance = data.currentUser.walletBalance;
-            user.totalSpent = data.currentUser.totalSpent;
-            user.totalGenerated = data.currentUser.totalGenerated;
-        }
-    }
-    
-    res.json({ success: true });
 });
 
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`\n🚀 Digital Street Backend [v3 - Accounts & Profiles] Active!`);
-    console.log(`🌐 API listening securely on Port ${PORT}`);
+    console.log(`🚀 Persistent Backend running at http://localhost:${PORT}`);
+    console.log(`📁 Saving data to: ${DB_FILE}`);
 });
