@@ -19,8 +19,8 @@
                 <i data-lucide="shield-check" style="color: var(--accent-purple);"></i>
                 <h1 style="background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Admin Control Center</h1>
             </div>
-            <button class="logout-btn" onclick="window.location.href='index.html'">
-                <i data-lucide="home"></i> Exit to Home
+            <button class="logout-btn" onclick="logout()">
+                <i data-lucide="log-out"></i> Logout
             </button>
         </header>
 
@@ -76,16 +76,53 @@
                 </div>
             </section>
 
+            <!-- Order History -->
+            <section class="glass-panel" style="padding: 1.5rem; border-top: 2px solid var(--accent-purple);">
+                <h2 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="history" style="color: var(--accent-purple);"></i> Recent Orders History</h2>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="color: var(--text-secondary); border-bottom: 1px solid var(--panel-border);">
+                                <th style="padding: 1rem;">Time / Date</th>
+                                <th style="padding: 1rem;">Product</th>
+                                <th style="padding: 1rem;">Vendor</th>
+                                <th style="padding: 1rem;">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table">
+                            <!-- Rows via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Support Tickets -->
+            <section class="glass-panel" style="padding: 1.5rem; border-top: 2px solid var(--accent-blue);">
+                <h2 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="life-buoy" style="color: var(--accent-blue);"></i> Open Support Tickets</h2>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="color: var(--text-secondary); border-bottom: 1px solid var(--panel-border);">
+                                <th style="padding: 1rem;">Customer</th>
+                                <th style="padding: 1rem;">Issue Description</th>
+                                <th style="padding: 1rem; text-align:right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-support-table">
+                            <!-- Rows via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
     </div>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="./script.js"></script>
-    <script>
+    <script type="module" src="./script.js"></script>
+    <script type="module">
         document.addEventListener("DOMContentLoaded", () => {
             window.APP_MODE = 'ADMIN';
-            initApp();
         });
     </script>
 </body>

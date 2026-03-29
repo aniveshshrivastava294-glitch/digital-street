@@ -1,0 +1,15 @@
+{
+  "name": "digital-street",
+  "version": "1.0.0",
+  "description": "Connecting neighborhoods with fresh local goods.",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "install-backend": "cd backend && npm install",
+    "dev": "cd backend && node server.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

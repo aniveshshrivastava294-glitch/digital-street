@@ -91,31 +91,47 @@
 
         <div class="login-divider"></div>
         
-        <div style="text-align: center;">
-            <a href="#" onclick="promptAdminLogin(event)" style="color: var(--text-secondary); font-size: 0.8rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
-                <i data-lucide="shield" style="width: 12px; height: 12px;"></i> Admin Access
+        <div style="text-align: center; display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
+            <p style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Platform Administration</p>
+            <a href="admin_login.html" class="primary-btn" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--accent-purple); width: auto; font-size: 0.85rem; padding: 0.5rem 1.5rem; text-decoration: none;">
+                <i data-lucide="shield" style="width: 14px; height: 14px;"></i> Enterprise Portal
             </a>
         </div>
     </div>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            updateProfile,
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
         document.addEventListener("DOMContentLoaded", () => {
             lucide.createIcons();
             // Automatically redirect if session exists
-            const session = localStorage.getItem('digitalStreetSession');
-            if (session) {
-                const user = JSON.parse(session);
-                if (user.role === 'CUSTOMER') window.location.href = 'customer.html';
-                else window.location.href = 'vendor.html';
-            }
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const userDoc = await getDoc(doc(db, "users", user.email));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        localStorage.setItem('digitalStreetSession', JSON.stringify({ ...userData, email: user.email }));
+                        if (userData.role === 'CUSTOMER') window.location.href = 'customer.html';
+                        else if (userData.role === 'VENDOR') window.location.href = 'vendor.html';
+                        else if (userData.role === 'ADMIN') window.location.href = 'admin.html';
+                    } else if (user.email === 'admin@example.com' || user.email === 'admin') {
+                        // Handle legacy admin or special case
+                        window.location.href = 'admin.html';
+                    }
+                }
+            });
         });
 
-        const currentHost = window.location.hostname;
-        const API_BASE = `http://${currentHost}:3000/api`;
-
-        function switchAuth(type) {
+        window.switchAuth = (type) => {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
             if (type === 'login') {
@@ -125,62 +141,94 @@
                 document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
                 document.getElementById('signup-form').classList.add('active');
             }
-        }
+        };
 
-        function switchRole(role) {
+        window.switchRole = (role) => {
             document.getElementById('role-customer').classList.toggle('active', role === 'CUSTOMER');
             document.getElementById('role-vendor').classList.toggle('active', role === 'VENDOR');
             document.getElementById('signup-role').value = role;
             document.getElementById('vendor-fields').classList.toggle('active', role === 'VENDOR');
             document.getElementById('signup-shopname').required = (role === 'VENDOR');
             document.getElementById('signup-phone').required = (role === 'VENDOR');
-        }
+        };
 
-        async function handleAuth(event, type) {
+        window.handleAuth = async (event, type) => {
             event.preventDefault();
-            const url = type === 'login' ? `${API_BASE}/login` : `${API_BASE}/register`;
+            const email = document.getElementById(`${type}-email`).value.trim();
+            const password = document.getElementById(`${type}-password`).value.trim();
             
-            const payload = {
-                email: document.getElementById(`${type}-email`).value.trim(),
-                password: document.getElementById(`${type}-password`).value.trim()
-            };
-            
-            if (type === 'signup') {
-                payload.role = document.getElementById('signup-role').value;
-                payload.name = document.getElementById('signup-name').value.trim();
-                payload.shopName = document.getElementById('signup-shopname').value.trim();
-                payload.phoneNumber = document.getElementById('signup-phone').value.trim();
-            }
-
             try {
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                
-                if (data.success) {
-                    localStorage.setItem('digitalStreetSession', JSON.stringify(data.user));
-                    if (data.user.role === 'CUSTOMER') window.location.href = 'customer.html';
-                    else window.location.href = 'vendor.html';
+                if (type === 'login') {
+                    // Admin override check
+                    if (email === 'admin' && password === 'Anivesh@123') {
+                        const adminUser = { name: 'Platform Admin', email: 'admin', role: 'ADMIN', walletBalance: 0, totalSpent: 0, totalGenerated: 0 };
+                        localStorage.setItem('digitalStreetSession', JSON.stringify(adminUser));
+                        window.location.href = "admin.html";
+                        return;
+                    }
+
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    const userDoc = await getDoc(doc(db, "users", email));
+                    if(userDoc.exists()) {
+                        const userData = userDoc.data();
+                        localStorage.setItem('digitalStreetSession', JSON.stringify({ ...userData, email }));
+                        if (userData.role === 'CUSTOMER') window.location.href = 'customer.html';
+                        else window.location.href = 'vendor.html';
+                    }
                 } else {
-                    alert(data.message || "Authentication error.");
+                    const role = document.getElementById('signup-role').value;
+                    const name = document.getElementById('signup-name').value.trim();
+                    const shopName = document.getElementById('signup-shopname').value.trim();
+                    const phoneNumber = document.getElementById('signup-phone').value.trim();
+
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    // Create Firestore User Document
+                    const newUser = { 
+                        name, email, role, shopName, phoneNumber,
+                        walletBalance: 0, totalSpent: 0, totalGenerated: 0 
+                    };
+                    await setDoc(doc(db, "users", email), newUser);
+                    
+                    localStorage.setItem('digitalStreetSession', JSON.stringify(newUser));
+                    if (role === 'CUSTOMER') window.location.href = 'customer.html';
+                    else window.location.href = 'vendor.html';
                 }
-            } catch (e) {
-                alert("Error connecting to server. Check if node server is running.");
+            } catch (error) {
+                console.error("Auth Error:", error);
+                // Show friendly, human-readable error messages
+                if (error.code === 'auth/email-already-in-use') {
+                    alert("✅ You already have an account! Please use the Login tab to sign in.");
+                    switchAuth('login');
+                    document.getElementById('login-email').value = email;
+                } else if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    alert("❌ No account found with this email. Please Sign Up first.");
+                    switchAuth('signup');
+                } else if (error.code === 'auth/wrong-password') {
+                    alert("❌ Incorrect password. Please try again.");
+                } else if (error.code === 'auth/invalid-email') {
+                    alert("❌ Please enter a valid email address.");
+                } else if (error.code === 'auth/weak-password') {
+                    alert("❌ Password must be at least 6 characters.");
+                } else {
+                    alert("Something went wrong: " + (error.message || "Please try again."));
+                }
             }
-        }
+        };
         
-        function promptAdminLogin(e) {
+        window.promptAdminLogin = async (e) => {
             e.preventDefault();
             const pwd = prompt("Enter Administration Password:");
-            if(pwd === "Anivesh@123") {
+            if(pwd === 'Anivesh@123') {
+                const adminUser = { name: 'Platform Admin', email: 'admin', role: 'ADMIN', walletBalance: 0, totalSpent: 0, totalGenerated: 0 };
+                localStorage.setItem('digitalStreetSession', JSON.stringify(adminUser));
                 window.location.href = "admin.html";
-            } else if (pwd !== null) {
+            } else {
                 alert("Incorrect Password.");
             }
-        }
+        };
     </script>
 </body>
 </html>

@@ -102,16 +102,34 @@
         </div>
     </div>
 
+    <!-- Complete Pickup Modal -->
+    <div id="pickup-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel" style="background: var(--bg-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Verify Customer Pickup</h2>
+                <button onclick="closePickupModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Ask the customer for their 4-digit Pickup Code to claim the revenue.</p>
+                <div class="input-group">
+                    <label>4-Digit Pickup Code</label>
+                    <input type="text" id="pickup-code-input" placeholder="0000" maxlength="4" class="modal-input" style="text-align: center; font-size: 2rem; letter-spacing: 1rem; font-weight: 800;" />
+                </div>
+                <input type="hidden" id="current-pickup-item-id" />
+                <button class="primary-btn huge-btn" style="background: var(--accent-green); color:black;" onclick="confirmPickup()">Verify & Claim Revenue</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="./script.js"></script>
-    <script>
+    <script type="module" src="./script.js"></script>
+    <script type="module">
         document.addEventListener("DOMContentLoaded", () => {
             window.APP_MODE = 'VENDOR';
-            initApp();
         });
     </script>
 </body>

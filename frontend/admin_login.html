@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Portal - Admin Login</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="login-body">
+    <div class="login-container glass-panel" style="max-width: 400px; border-top: 4px solid var(--accent-purple);">
+        <div class="login-header">
+            <i data-lucide="shield-check" class="logo-icon-large" style="color: var(--accent-purple);"></i>
+            <h1>Admin Access</h1>
+            <p>Enter your secure credentials to access the Digital Street Command Center.</p>
+        </div>
+        
+        <form onsubmit="handleAdminLogin(event)" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="input-group">
+                <label>Administrator Password</label>
+                <input type="password" id="admin-password" class="auth-input" placeholder="••••••••" required autofocus>
+            </div>
+            
+            <button type="submit" id="admin-login-btn" class="primary-btn huge-btn" style="background: var(--accent-purple); color: white;">
+                <i data-lucide="lock-open"></i> Authenticate & Enter
+            </button>
+            <a href="index.html" style="text-align: center; color: var(--text-secondary); text-decoration: none; font-size: 0.85rem;">← Back to Home Page</a>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => lucide.createIcons());
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('admin-login-btn');
+            const pwd = document.getElementById('admin-password').value;
+            btn.disabled = true;
+            btn.innerText = "Authenticating...";
+
+            let API_BASE = '/api';
+            if (window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && window.location.port !== '3000')) {
+                API_BASE = 'http://localhost:3000/api';
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'admin', password: pwd })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    localStorage.setItem('digitalStreetSession', JSON.stringify(data.user));
+                    window.location.href = "admin.html";
+                } else {
+                    alert("Authentication Denied.");
+                    btn.disabled = false;
+                    btn.innerHTML = `<i data-lucide="lock-open"></i> Authenticate & Enter`;
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                alert("Server Connection Error.");
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="lock-open"></i> Authenticate & Enter`;
+                lucide.createIcons();
+            }
+        }
+    </script>
+</body>
+</html>

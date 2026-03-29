@@ -8,10 +8,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const DB_FILE = path.join(__dirname, 'database.json');
+const PORT = process.env.PORT || 3000;
+const DB_FILE = path.join(__dirname, '..', 'database.json'); // Moved to Project Root
+const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
+
+// Serve static frontend files
+app.use(express.static(FRONTEND_DIR));
+
+// 🩺 Health Check
+app.get('/api/ping', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
 // Initialize State from Disk or Defaults
 let state = {
+    version: Date.now(), // 🚀 Version tracking for speed
     storeItems: [
         { id: 1, title: 'Fresh Sourdough', price: 120, originalPrice: 120, status: 'IN_STOCK', vendorName: 'Anivesh Bakery', vendorPhone: '+91 999 000 111', vendorEmail: 'anivesh@example.com', visual: 'sandwich', flashSaleActive: false, reservedTokens: [] },
         { id: 2, title: 'Farm Eggs (Dozen)', price: 180, originalPrice: 180, status: 'IN_STOCK', vendorName: 'Green Meadows', vendorPhone: '+91 888 777 666', vendorEmail: 'green@example.com', visual: 'egg', flashSaleActive: false, reservedTokens: [] }
@@ -33,6 +42,7 @@ function loadDB() {
 }
 
 function saveDB() {
+    state.version = Date.now(); // 🚀 Increment version
     try {
         fs.writeFileSync(DB_FILE, JSON.stringify(state, null, 2), 'utf8');
         console.log("📂 Database Saved to Disk.");
@@ -91,6 +101,15 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
+    
+    // 🛡️ Admin Override
+    if (email === 'admin' && password === 'Anivesh@123') {
+        return res.json({ 
+            success: true, 
+            user: { name: 'Platform Admin', email: 'admin', role: 'ADMIN', walletBalance: 0, totalSpent: 0, totalGenerated: 0 } 
+        });
+    }
+
     const user = state.users.find(u => u.email === email);
     
     if (user) {
@@ -129,8 +148,8 @@ app.post('/api/profile/update', (req, res) => {
     }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Secure Persistent Backend running at http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Digital Street Platform running at http://localhost:${PORT}`);
     console.log(`📁 Database: ${DB_FILE}`);
+    console.log(`🌐 Serving Frontend from: ${FRONTEND_DIR}`);
 });
