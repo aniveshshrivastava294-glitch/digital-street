@@ -316,7 +316,7 @@ function renderVendorView() {
         const activeHolds = (item.reservedTokens || []).length;
         const btnStyle = activeHolds > 0 ? "background: var(--accent-orange); color: white;" : "opacity:0.3; cursor:not-allowed;";
 
-        card.innerHTML = `<div style="display:flex; gap:1rem; align-items:center;">${visualHTML}<div class="product-info-top" style="flex-direction: column; flex:1;"><h3>${item.title}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${activeHolds} active</span></div></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock('${item.id}')">${toggleText}</button><button class="huge-btn" onclick="toggleFlashSale('${item.id}')">${item.flashSaleActive ? 'End Flash' : 'Flash Sale'}</button><button class="huge-btn" style="${btnStyle}" onclick="activeHolds > 0 ? openPickupModal('${item.id}') : null"><i data-lucide="shield-check"></i> Verify Pickup</button></div>`;
+        card.innerHTML = `<div style="display:flex; gap:1rem; align-items:center;">${visualHTML}<div class="product-info-top" style="flex-direction: column; flex:1;"><h3>${item.title}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${activeHolds} active</span></div></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock('${item.id}')">${toggleText}</button><button class="huge-btn" onclick="toggleFlashSale('${item.id}')">${item.flashSaleActive ? 'End Flash' : 'Flash Sale'}</button><button class="huge-btn" style="${btnStyle}" onclick="${activeHolds > 0 ? `openPickupModal('${item.id}')` : `showNoHoldsToast()`}"><i data-lucide="shield-check"></i> Verify Pickup</button></div>`;
         list.appendChild(card);
     });
     lucide.createIcons();
@@ -553,3 +553,4 @@ function tickTimers() {
 
 window.openSupportModal = () => document.getElementById("support-modal").classList.remove("hidden");
 window.closeSupportModal = () => document.getElementById("support-modal").classList.add("hidden");
+window.showNoHoldsToast = () => showToast("No pending orders to verify.");
