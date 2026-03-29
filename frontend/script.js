@@ -80,10 +80,24 @@ onAuthStateChanged(auth, async (user) => {
             reRenderActive();
         }
     } else {
+        // Check if this is an admin session (admin has no Firebase account)
+        const session = localStorage.getItem('digitalStreetSession');
+        const isAdminAuth = localStorage.getItem('adminAuthenticated') === 'true';
+        
+        if (session && isAdminAuth) {
+            // Admin session — load from localStorage and allow access
+            currentUser = JSON.parse(session);
+            updateHeaderUI();
+            reRenderActive();
+            return;
+        }
+
         currentUser = null;
         localStorage.removeItem('digitalStreetSession');
-        // Protection logic handled by individual HTML files or here
-        const isPublicPage = window.location.pathname.includes('index.html') || window.location.pathname.includes('admin_login.html');
+        const isPublicPage = window.location.pathname.includes('index.html') || 
+                             window.location.pathname.includes('admin_login.html') ||
+                             window.location.pathname === '/' ||
+                             window.location.pathname.endsWith('/');
         if (!isPublicPage) window.location.href = 'index.html';
     }
 });
@@ -149,7 +163,12 @@ window.updateProfile = async function() {
 }
 
 window.logout = function() {
+    localStorage.removeItem('adminAuthenticated');
     signOut(auth).then(() => {
+        window.location.href = 'index.html';
+    }).catch(() => {
+        // Admin has no Firebase account, just redirect
+        localStorage.removeItem('digitalStreetSession');
         window.location.href = 'index.html';
     });
 }

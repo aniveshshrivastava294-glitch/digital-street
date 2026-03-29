@@ -35,40 +35,28 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => lucide.createIcons());
 
-        async function handleAdminLogin(e) {
+        function handleAdminLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('admin-login-btn');
             const pwd = document.getElementById('admin-password').value;
-            btn.disabled = true;
-            btn.innerText = "Authenticating...";
 
-            let API_BASE = '/api';
-            if (window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && window.location.port !== '3000')) {
-                API_BASE = 'http://localhost:3000/api';
-            }
-
-            try {
-                const res = await fetch(`${API_BASE}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: 'admin', password: pwd })
-                });
-                const data = await res.json();
-                
-                if (data.success) {
-                    localStorage.setItem('digitalStreetSession', JSON.stringify(data.user));
-                    window.location.href = "admin.html";
-                } else {
-                    alert("Authentication Denied.");
-                    btn.disabled = false;
-                    btn.innerHTML = `<i data-lucide="lock-open"></i> Authenticate & Enter`;
-                    lucide.createIcons();
-                }
-            } catch (e) {
-                alert("Server Connection Error.");
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="lock-open"></i> Authenticate & Enter`;
-                lucide.createIcons();
+            // Direct password check — no API or Firebase needed for admin
+            if (pwd === 'Anivesh@123') {
+                const adminUser = { 
+                    name: 'Platform Admin', 
+                    email: 'admin', 
+                    role: 'ADMIN', 
+                    walletBalance: 0, 
+                    totalSpent: 0, 
+                    totalGenerated: 0 
+                };
+                localStorage.setItem('digitalStreetSession', JSON.stringify(adminUser));
+                localStorage.setItem('adminAuthenticated', 'true');
+                window.location.href = "admin.html";
+            } else {
+                alert("❌ Incorrect Admin Password.");
+                document.getElementById('admin-password').value = '';
+                document.getElementById('admin-password').focus();
             }
         }
     </script>
