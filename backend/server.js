@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 app.use(cors());
@@ -12,8 +13,8 @@ const DB_FILE = path.join(__dirname, 'database.json');
 // Initialize State from Disk or Defaults
 let state = {
     storeItems: [
-        { id: 1, title: 'Fresh Sourdough', price: 120, originalPrice: 120, status: 'IN_STOCK', vendorName: 'Anivesh Bakery', vendorPhone: '+91 999 000 111', vendorEmail: 'anivesh@example.com', flashSaleActive: false, reservedTokens: [] },
-        { id: 2, title: 'Farm Eggs (Dozen)', price: 180, originalPrice: 180, status: 'IN_STOCK', vendorName: 'Green Meadows', vendorPhone: '+91 888 777 666', vendorEmail: 'green@example.com', flashSaleActive: false, reservedTokens: [] }
+        { id: 1, title: 'Fresh Sourdough', price: 120, originalPrice: 120, status: 'IN_STOCK', vendorName: 'Anivesh Bakery', vendorPhone: '+91 999 000 111', vendorEmail: 'anivesh@example.com', visual: 'sandwich', flashSaleActive: false, reservedTokens: [] },
+        { id: 2, title: 'Farm Eggs (Dozen)', price: 180, originalPrice: 180, status: 'IN_STOCK', vendorName: 'Green Meadows', vendorPhone: '+91 888 777 666', vendorEmail: 'green@example.com', visual: 'egg', flashSaleActive: false, reservedTokens: [] }
     ],
     platformMetrics: { totalIncome: 0, salesHistory: [] },
     users: []
@@ -53,38 +54,55 @@ app.post('/api/state', (req, res) => {
     state.storeItems = req.body.storeItems;
     state.platformMetrics = req.body.platformMetrics;
     
-    // Update individual user stats if provided
     if(req.body.currentUser) {
         const uIdx = state.users.findIndex(u => u.email === req.body.currentUser.email);
-        if(uIdx !== -1) state.users[uIdx] = req.body.currentUser;
+        if(uIdx !== -1) {
+            // Preserve the password hash when updating other user stats
+            const currentHash = state.users[uIdx].password;
+            state.users[uIdx] = { ...req.body.currentUser, password: currentHash };
+        }
     }
     
     saveDB();
     res.json({ success: true });
 });
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
     const { name, email, password, role, shopName, phoneNumber } = req.body;
     if (state.users.find(u => u.email === email)) {
         return res.status(400).json({ success: false, message: "User already exists." });
     }
+
+    // 🔐 Security: Hash Password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = { 
-        name, email, password, role, shopName, phoneNumber,
+        name, email, password: hashedPassword, role, shopName, phoneNumber,
         walletBalance: 0, totalSpent: 0, totalGenerated: 0 
     };
     state.users.push(newUser);
     saveDB();
-    res.json({ success: true, user: newUser });
+    
+    // Return user without hash
+    const { password: _, ...userWithoutPass } = newUser;
+    res.json({ success: true, user: userWithoutPass });
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    const user = state.users.find(u => u.email === email && u.password === password);
+    const user = state.users.find(u => u.email === email);
+    
     if (user) {
-        res.json({ success: true, user });
-    } else {
-        res.status(401).json({ success: false, message: "Invalid Credentials." });
+        // 🔐 Security: Securely Compare Hashes
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (isMatch) {
+            const { password: _, ...userWithoutPass } = user;
+            return res.json({ success: true, user: userWithoutPass });
+        }
     }
+    
+    res.status(401).json({ success: false, message: "Invalid Credentials." });
 });
 
 app.post('/api/profile/update', (req, res) => {
@@ -96,7 +114,6 @@ app.post('/api/profile/update', (req, res) => {
             state.users[uIdx].shopName = shopName;
             state.users[uIdx].phoneNumber = phoneNumber;
         }
-        // Update items owned by this vendor too
         state.storeItems.forEach(item => {
             if(item.vendorEmail === email) {
                 item.vendorName = shopName || name;
@@ -104,7 +121,9 @@ app.post('/api/profile/update', (req, res) => {
             }
         });
         saveDB();
-        res.json({ success: true, user: state.users[uIdx] });
+        
+        const { password: _, ...userWithoutPass } = state.users[uIdx];
+        res.json({ success: true, user: userWithoutPass });
     } else {
         res.status(404).json({ success: false });
     }
@@ -112,6 +131,6 @@ app.post('/api/profile/update', (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Persistent Backend running at http://localhost:${PORT}`);
-    console.log(`📁 Saving data to: ${DB_FILE}`);
+    console.log(`🚀 Secure Persistent Backend running at http://localhost:${PORT}`);
+    console.log(`📁 Database: ${DB_FILE}`);
 });

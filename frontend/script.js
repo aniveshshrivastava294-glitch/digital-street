@@ -5,6 +5,7 @@ let platformMetrics = { totalIncome: 0, salesHistory: [] };
 let customersArray = [];
 let vendorsArray = [];
 let currentUser = null; 
+let searchQuery = ""; // NEW: Search state
 
 // Dynamically route API
 const currentHost = window.location.hostname;
@@ -131,37 +132,108 @@ window.logout = function() {
     window.location.href = 'index.html';
 }
 
+/* ================= SEARCH LOGIC ================= */
+window.handleSearch = function(val) {
+    searchQuery = val.toLowerCase().trim();
+    renderCustomerView();
+}
+
 /* ================= CUSTOMER VIEW ================= */
 function renderCustomerView() {
     const balanceElem = document.getElementById("customer-wallet-balance");
     if (balanceElem && currentUser) balanceElem.innerText = formatCurrency(currentUser.walletBalance || 0);
 
     const list = document.getElementById("customer-product-list");
+    const banner = document.getElementById("offers-banner");
+    const bannerContainer = document.getElementById("offers-banner-container");
     if (!list) return;
-    list.innerHTML = "";
 
-    storeItems.forEach(item => {
+    // 1. Filtering Logic
+    const filteredItems = storeItems.filter(item => {
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery) || 
+                             item.vendorName.toLowerCase().includes(searchQuery);
+        return matchesSearch;
+    });
+
+    // 2. Banner Logic (Flash Sales)
+    const flashSales = storeItems.filter(item => item.flashSaleActive && item.status === 'IN_STOCK');
+    if (flashSales.length > 0 && searchQuery === "") {
+        bannerContainer.classList.remove("hidden");
+        banner.innerHTML = "";
+        flashSales.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "banner-item";
+            
+            let visualHTML = `<div class="banner-visual"><i data-lucide="package" class="product-icon"></i></div>`;
+            if (item.visual) {
+                if (item.visual.startsWith('http')) {
+                    visualHTML = `<div class="banner-visual"><img src="${item.visual}" class="product-img"></div>`;
+                } else {
+                    visualHTML = `<div class="banner-visual"><i data-lucide="${item.visual}" class="product-icon"></i></div>`;
+                }
+            }
+
+            div.innerHTML = `
+                <div class="offer-badge">Sale</div>
+                ${visualHTML}
+                <div class="banner-info">
+                    <h4 style="margin:0; font-size:0.9rem;">${item.title}</h4>
+                    <div style="color:var(--accent-orange); font-weight:700;">${formatCurrency(item.price)}</div>
+                    <small style="color:var(--text-secondary); font-size:0.7rem;">${item.vendorName}</small>
+                </div>
+            `;
+            div.onclick = () => {
+                const searchInput = document.getElementById("search-input");
+                if(searchInput) { searchInput.value = item.title; handleSearch(item.title); }
+            };
+            banner.appendChild(div);
+        });
+    } else {
+        bannerContainer.classList.add("hidden");
+    }
+
+    // 3. Main Grid Rendering
+    list.innerHTML = "";
+    if(filteredItems.length === 0) {
+        list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 3rem; color:var(--text-secondary);">No products found matching "${searchQuery}"</div>`;
+    }
+
+    filteredItems.forEach(item => {
         const card = document.createElement("div");
         card.className = "product-card glass-panel";
-        const vendorContactHTML = `<div class="vendor-info-card" style="margin-top: 0.5rem; padding: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 6px;"><div style="font-size: 0.75rem; color: var(--text-secondary);"><i data-lucide="store" style="width:12px; height:12px"></i> ${item.vendorName}</div><div style="font-size: 0.8rem; font-weight:600; color: var(--accent-blue); display:flex; align-items:center; gap:0.3rem;"><i data-lucide="phone" style="width:12px; height:12px"></i> Call: ${item.vendorPhone}</div></div>`;
+        const vendorContactHTML = `
+            <div class="vendor-info-card" style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1); border-radius: 8px;">
+                <div style="font-size: 0.8rem; font-weight:700; color: var(--accent-blue); display:flex; align-items:center; gap:0.4rem; margin-bottom:0.2rem;">
+                    <i data-lucide="store" style="width:14px; height:14px"></i> ${item.vendorName}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); display:flex; align-items:center; gap:0.4rem;">
+                    <i data-lucide="phone" style="width:12px; height:12px"></i> Call: ${item.vendorPhone}
+                </div>
+            </div>`;
 
-        let badgeHTML = "";
-        let reserveHTML = "";
+        // Determine visual
+        let visualHTML = `<div class="product-visual-container"><i data-lucide="package" class="product-icon"></i></div>`;
+        if (item.visual) {
+            if (item.visual.startsWith('http') || item.visual.startsWith('data:')) {
+                visualHTML = `<div class="product-visual-container image-visual"><img src="${item.visual}" alt="${item.title}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=200&auto=format&fit=crop'"></div>`;
+            } else {
+                visualHTML = `<div class="product-visual-container"><i data-lucide="${item.visual}" class="product-icon"></i></div>`;
+            }
+        }
+
         let priceHTML = `<span>${formatCurrency(item.price)}</span>`;
         if (item.flashSaleActive) priceHTML = `<small>${formatCurrency(item.originalPrice)}</small><span>${formatCurrency(item.price)}</span>`;
         
+        let badgeHTML = "";
+        let reserveHTML = "";
         if (item.status === 'IN_STOCK') {
-            badgeHTML = `<span class="badge badge-stock"><i data-lucide="check-circle" style="width:12px; height:12px"></i> In Stock</span>`;
-            if (item.flashSaleActive) badgeHTML += ` <span class="badge badge-flash"><i data-lucide="zap" style="width:12px; height:12px"></i> Flash Deal Active</span>`;
-            reserveHTML = `<button class="primary-btn" style="width:100%; margin-top:1rem; justify-content:center; background:var(--accent-green); color:black;" onclick="reserveItem(${item.id})"><i data-lucide="shopping-cart"></i> Buy & Reserve (${formatCurrency(item.price)})</button>`;
-            if(currentUser && (currentUser.walletBalance || 0) < item.price) reserveHTML = `<button class="primary-btn" style="width:100%; margin-top:1rem; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>Insufficient Balance</button>`;
-        } else if (item.status === 'SOLD_OUT') {
-            badgeHTML = `<span class="badge badge-sold"><i data-lucide="x-circle" style="width:12px; height:12px"></i> Sold Out</span>`;
-            reserveHTML = `<button class="btn-reserve" disabled>Sold Out</button>`;
-        } else if (item.status === 'TIMER') {
-            const timeLeft = Math.max(0, Math.ceil((item.timerTarget - Date.now()) / 1000 / 60));
-            badgeHTML = `<span class="badge badge-timer"><i data-lucide="flame" style="width:12px; height:12px"></i> Batch Ready in <span class="timer-display-${item.id}">${timeLeft}</span>m</span>`;
-            reserveHTML = `<button class="btn-reserve" disabled>Baking...</button>`;
+            badgeHTML = `<span class="badge badge-stock">In Stock</span>`;
+            if (item.flashSaleActive) badgeHTML += ` <span class="badge badge-flash">Flash Deal</span>`;
+            reserveHTML = `<button class="primary-btn" style="width:100%; margin-top:1rem; justify-content:center; background:var(--accent-green); color:black;" onclick="reserveItem(${item.id})"><i data-lucide="shopping-cart"></i> Buy Now</button>`;
+            if(currentUser && (currentUser.walletBalance || 0) < item.price) reserveHTML = `<button class="primary-btn" style="width:100%; margin-top:1rem; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>Refill Wallet</button>`;
+        } else {
+            badgeHTML = `<span class="badge badge-sold">Sold Out</span>`;
+            reserveHTML = `<button class="btn-reserve" disabled>Not Available</button>`;
         }
 
         let tokenDisplay = "";
@@ -171,7 +243,7 @@ function renderCustomerView() {
             reserveHTML = ""; 
         }
 
-        card.innerHTML = `<div class="product-info-top"><div class="product-title"><h3>${item.title}</h3></div><div class="price-tag">${priceHTML}</div></div>${vendorContactHTML}<div style="margin-top: 0.5rem;">${badgeHTML}</div>${tokenDisplay}${reserveHTML}`;
+        card.innerHTML = `${visualHTML}<div class="product-info-top"><div class="product-title"><h3>${item.title}</h3></div><div class="price-tag">${priceHTML}</div></div>${vendorContactHTML}<div style="margin-top: 0.5rem;">${badgeHTML}</div>${tokenDisplay}${reserveHTML}`;
         list.appendChild(card);
     });
     lucide.createIcons(); 
@@ -214,7 +286,17 @@ function renderVendorView() {
         const isTimer = item.status === 'TIMER';
         let stockToggleText = isStocked ? "Set Sold Out" : (isTimer ? "Cancel timer" : "Set In Stock");
 
-        card.innerHTML = `<div class="product-info-top" style="flex-direction: column;"><h3>${item.title}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${item.reservedTokens?item.reservedTokens.length:0} active</span></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock(${item.id})">${stockToggleText}</button><button class="huge-btn" onclick="toggleBatchDrawer(${item.id})">Batch...</button><button class="huge-btn" onclick="toggleFlashSale(${item.id})">${item.flashSaleActive ? 'End Flash' : 'Flash'}</button><button class="huge-btn" style="background: var(--accent-orange); color: white;" onclick="logSale(${item.id})"><i data-lucide="indian-rupee"></i> Log Sale</button></div><div id="batch-drawer-${item.id}" class="timer-drawer" style="display:none;"><button class="timer-btn" onclick="startBatchTimer(${item.id}, 10)">10m</button><button class="timer-btn" onclick="startBatchTimer(${item.id}, 30)">30m</button><button class="timer-btn" onclick="startBatchTimer(${item.id}, 60)">60m</button></div>`;
+        // Determine if visual is an image URL or Lucide Icon
+        let visualHTML = `<div class="product-visual-container mini-visual"><i data-lucide="package" class="product-icon"></i></div>`;
+        if (item.visual) {
+            if (item.visual.startsWith('http') || item.visual.startsWith('data:')) {
+                visualHTML = `<div class="product-visual-container mini-visual image-visual"><img src="${item.visual}" alt="${item.title}" class="product-img"></div>`;
+            } else {
+                visualHTML = `<div class="product-visual-container mini-visual"><i data-lucide="${item.visual}" class="product-icon"></i></div>`;
+            }
+        }
+
+        card.innerHTML = `<div style="display:flex; gap:1rem; align-items:center;">${visualHTML}<div class="product-info-top" style="flex-direction: column; flex:1;"><h3>${item.title}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${item.reservedTokens?item.reservedTokens.length:0} active</span></div></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock(${item.id})">${stockToggleText}</button><button class="huge-btn" onclick="toggleBatchDrawer(${item.id})">Batch...</button><button class="huge-btn" onclick="toggleFlashSale(${item.id})">${item.flashSaleActive ? 'End Flash' : 'Flash'}</button><button class="huge-btn" style="background: var(--accent-orange); color: white;" onclick="logSale(${item.id})"><i data-lucide="indian-rupee"></i> Log Sale</button></div><div id="batch-drawer-${item.id}" class="timer-drawer" style="display:none;"><button class="timer-btn" onclick="startBatchTimer(${item.id}, 10)">10m</button><button class="timer-btn" onclick="startBatchTimer(${item.id}, 30)">30m</button><button class="timer-btn" onclick="startBatchTimer(${item.id}, 60)">60m</button></div>`;
         list.appendChild(card);
     });
     lucide.createIcons();
@@ -324,8 +406,9 @@ window.saveNewItem = async function() {
     await loadStore();
     const name = document.getElementById("new-item-name").value.trim();
     const price = parseFloat(document.getElementById("new-item-price").value.trim());
+    const visual = document.getElementById("new-item-visual").value.trim();
     if (!name || isNaN(price) || !currentUser) return showToast("Invalid inputs.");
-    storeItems.push({ id: Date.now(), title: name, vendorEmail: currentUser.email, vendorName: currentUser.shopName || currentUser.name, vendorPhone: currentUser.phoneNumber || 'Private', price, originalPrice: price, status: 'IN_STOCK', timerTarget: null, flashSaleActive: false, reservedTokens: [] });
+    storeItems.push({ id: Date.now(), title: name, vendorEmail: currentUser.email, vendorName: currentUser.shopName || currentUser.name, vendorPhone: currentUser.phoneNumber || 'Private', price, originalPrice: price, visual, status: 'IN_STOCK', timerTarget: null, flashSaleActive: false, reservedTokens: [] });
     await saveStore(); closeAddModal(); showToast(`Added ${name}!`); reRenderActive();
 }
 
