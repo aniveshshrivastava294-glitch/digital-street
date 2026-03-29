@@ -553,4 +553,3 @@ function tickTimers() {
 
 window.openSupportModal = () => document.getElementById("support-modal").classList.remove("hidden");
 window.closeSupportModal = () => document.getElementById("support-modal").classList.add("hidden");
-window.closeAddFundsModal = () => document.getElementById("add-funds-modal").classList.add("hidden");

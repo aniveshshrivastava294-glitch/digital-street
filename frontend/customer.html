@@ -140,13 +140,10 @@
     <div id="toast-container" class="toast-container"></div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script type="module" src="./script.js"></script>
     <script type="module">
-        import { auth } from './firebase-config.js';
-        document.addEventListener("DOMContentLoaded", () => {
-            window.APP_MODE = 'CUSTOMER';
-            // Initializing will happen inside script.js module
-        });
+        // Set APP_MODE BEFORE script.js loads so reRenderActive works correctly
+        window.APP_MODE = 'CUSTOMER';
     </script>
+    <script type="module" src="./script.js"></script>
 </body>
 </html>
