@@ -103,10 +103,10 @@ app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
     // 🛡️ Admin Override
-    if (email === 'admin' && password === 'Anivesh@123') {
+    if (email === 'admin@admin.com' && password === 'Anivesh@123') {
         return res.json({ 
             success: true, 
-            user: { name: 'Platform Admin', email: 'admin', role: 'ADMIN', walletBalance: 0, totalSpent: 0, totalGenerated: 0 } 
+            user: { name: 'Platform Admin', email: 'admin@admin.com', role: 'ADMIN', walletBalance: 0, totalSpent: 0, totalGenerated: 0 } 
         });
     }
 

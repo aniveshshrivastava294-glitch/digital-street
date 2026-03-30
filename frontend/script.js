@@ -15,6 +15,7 @@ let customersArray = [];
 let vendorsArray = [];
 let currentUser = null; 
 let searchQuery = ""; 
+let cameraStream = null;
 
 // 🚀 Real-time Firestore Listeners
 function initFirebaseListeners() {
@@ -251,35 +252,37 @@ function renderCustomerView() {
     filteredItems.forEach(item => {
         const card = document.createElement("div");
         card.className = "product-card glass-panel";
-        const vendorContactHTML = `<div class="vendor-info-card" style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1); border-radius: 8px;"><div style="font-size: 0.8rem; font-weight:700; color: var(--accent-blue); display:flex; align-items:center; gap:0.4rem; margin-bottom:0.2rem;"><i data-lucide="store" style="width:14px; height:14px"></i> ${item.vendorName}</div><div style="font-size: 0.75rem; color: var(--text-secondary); display:flex; align-items:center; gap:0.4rem;"><i data-lucide="phone" style="width:12px; height:12px"></i> Call: ${item.vendorPhone}</div></div>`;
+        const vendorContactHTML = `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${item.vendorName}</div>`;
 
-        let visualHTML = `<div class="product-visual-container"><i data-lucide="package" class="product-icon"></i></div>`;
+        const getValidIcon = (name) => {
+            const map = { 'tulips': 'flower', 'sunflower': 'flower', 'flower-2': 'flower', 'shop': 'store' };
+            return map[name.toLowerCase()] || name || 'package';
+        };
+
+        let visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon('package')}" class="product-icon"></i></div>`;
         if (item.visual) {
             if (item.visual.startsWith('http') || item.visual.startsWith('data:')) visualHTML = `<div class="product-visual-container image-visual"><img src="${item.visual}" class="product-img"></div>`;
-            else visualHTML = `<div class="product-visual-container"><i data-lucide="${item.visual}" class="product-icon"></i></div>`;
+            else visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon(item.visual)}" class="product-icon"></i></div>`;
         }
 
-        let priceHTML = `<span>${formatCurrency(item.price)}</span>`;
-        if (item.flashSaleActive) priceHTML = `<small>${formatCurrency(item.originalPrice)}</small><span>${formatCurrency(item.price)}</span>`;
+        let priceHTML = `<div style="color:var(--accent-orange); font-weight:800; font-size:1.2rem;">${formatCurrency(item.price)}</div>`;
+        if (item.flashSaleActive) priceHTML = `<div style="display:flex; align-items:center; gap:0.5rem; justify-content:center;"><small style="text-decoration:line-through; color:var(--text-secondary);">${formatCurrency(item.originalPrice)}</small><span style="color:var(--accent-orange); font-weight:800; font-size:1.2rem;">${formatCurrency(item.price)}</span></div>`;
         
-        let badgeHTML = item.status === 'IN_STOCK' ? `<span class="badge badge-stock">In Stock</span>` : `<span class="badge badge-sold">Sold Out</span>`;
-        if (item.flashSaleActive && item.status === 'IN_STOCK') badgeHTML += ` <span class="badge badge-flash">Flash Deal</span>`;
-
         let reserveHTML = "";
         if (item.status === 'IN_STOCK') {
-            reserveHTML = `<button class="primary-btn" style="width:100%; margin-top:1rem; justify-content:center; background:var(--accent-green); color:black;" onclick="reserveItem('${item.id}')"><i data-lucide="shopping-cart"></i> Buy Now</button>`;
-            if(currentUser && (currentUser.walletBalance || 0) < item.price) reserveHTML = `<button class="primary-btn" style="width:100%; margin-top:1rem; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>Refill Wallet</button>`;
+            reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; background:var(--accent-orange); color:white;" onclick="reserveItem('${item.id}')">BUY NOW</button>`;
+            if(currentUser && (currentUser.walletBalance || 0) < item.price) reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>REFILL WALLET</button>`;
         } else {
-            reserveHTML = `<button class="btn-reserve" disabled>Not Available</button>`;
+            reserveHTML = `<button class="btn-reserve" style="background:#ddd; color:#999;" disabled>SOLD OUT</button>`;
         }
 
         const myTokens = item.reservedTokens ? item.reservedTokens.filter(rt => rt.ownerEmail === currentUser?.email) : [];
         if (myTokens.length > 0) {
             const lastToken = myTokens[myTokens.length - 1];
-            const tokenDisplay = `<div class="code-reveal"><h4>Pickup Code</h4><div class="code">${lastToken.code}</div><button class="primary-btn" style="background:var(--accent-red); margin-top:0.5rem; width:100%; justify-content:center; font-size:0.7rem;" onclick="cancelOrder('${item.id}', '${lastToken.code}')"><i data-lucide="x-circle" style="width:12px; height:12px"></i> Cancel Order & Refund</button></div>`;
-            card.innerHTML = `${visualHTML}<div class="product-info-top"><div class="product-title"><h3>${item.title}</h3></div><div class="price-tag">${priceHTML}</div></div>${vendorContactHTML}<div style="margin-top: 0.5rem;">${badgeHTML}</div>${tokenDisplay}`;
+            const tokenDisplay = `<div class="code-reveal" style="margin-top:1rem;"><h4>Pickup Code</h4><div class="code" style="font-size:1.5rem;">${lastToken.code}</div><button class="primary-btn" style="background:var(--accent-red); margin-top:0.5rem; width:100%; justify-content:center; font-size:0.75rem;" onclick="cancelOrder('${item.id}', '${lastToken.code}')">Cancel & Refund</button></div>`;
+            card.innerHTML = `${visualHTML}<div class="product-info-top"><h3>${item.title}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${tokenDisplay}</div>`;
         } else {
-            card.innerHTML = `${visualHTML}<div class="product-info-top"><div class="product-title"><h3>${item.title}</h3></div><div class="price-tag">${priceHTML}</div></div>${vendorContactHTML}<div style="margin-top: 0.5rem;">${badgeHTML}</div>${reserveHTML}`;
+            card.innerHTML = `${visualHTML}<div class="product-info-top"><h3>${item.title}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${reserveHTML}</div>`;
         }
         list.appendChild(card);
     });
@@ -535,7 +538,13 @@ window.closeAddModal = () => document.getElementById("add-item-modal").classList
 window.saveNewItem = async function() {
     const name = document.getElementById("new-item-name").value.trim();
     const price = parseFloat(document.getElementById("new-item-price").value.trim());
-    const visual = document.getElementById("new-item-visual").value.trim();
+    let visual = document.getElementById("new-item-visual").value.trim();
+    
+    const photoPreview = document.getElementById("photo-preview");
+    if(photoPreview && photoPreview.src && !photoPreview.src.endsWith('vendor.html')) {
+        visual = photoPreview.src;
+    }
+
     if (!name || isNaN(price)) return showToast("Invalid inputs.");
 
     const id = Date.now().toString();
@@ -546,8 +555,78 @@ window.saveNewItem = async function() {
     };
     
     await setDoc(doc(db, "storeItems", id), newItem);
+    clearPhoto(); // Reset camera UI
     closeAddModal();
     showToast(`Added ${name}!`);
+}
+
+/* ================= CAMERA LOGIC ================= */
+window.startCamera = async function() {
+    const container = document.getElementById("camera-container");
+    const video = document.getElementById("camera-video");
+    const previewContainer = document.getElementById("photo-preview-container");
+
+    if (previewContainer) previewContainer.classList.add("hidden");
+    
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: 'environment' }, 
+            audio: false 
+        });
+        video.srcObject = cameraStream;
+        container.classList.remove("hidden");
+        lucide.createIcons();
+    } catch (err) {
+        console.error("Camera error:", err);
+        showToast("Could not access camera.");
+    }
+}
+
+window.stopCamera = function() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+    const container = document.getElementById("camera-container");
+    if (container) container.classList.add("hidden");
+}
+
+window.capturePhoto = function() {
+    const video = document.getElementById("camera-video");
+    const canvas = document.getElementById("camera-canvas");
+    const preview = document.getElementById("photo-preview");
+    const previewContainer = document.getElementById("photo-preview-container");
+    const visualInput = document.getElementById("new-item-visual");
+
+    if (!video || !canvas) return;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    const dataUrl = canvas.toDataURL('image/png');
+    preview.src = dataUrl;
+    previewContainer.classList.remove("hidden");
+    
+    // Clear the input if photo is taken
+    visualInput.value = "Photo Captured";
+    visualInput.disabled = true;
+
+    stopCamera();
+    showToast("Photo captured!");
+}
+
+window.clearPhoto = function() {
+    const preview = document.getElementById("photo-preview");
+    const previewContainer = document.getElementById("photo-preview-container");
+    const visualInput = document.getElementById("new-item-visual");
+
+    if (preview) preview.src = "";
+    if (previewContainer) previewContainer.classList.add("hidden");
+    if (visualInput) {
+        visualInput.value = "";
+        visualInput.disabled = false;
+    }
 }
 
 function showToast(msg) {

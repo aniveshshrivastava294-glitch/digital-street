@@ -1,24 +1,25 @@
 /* CSS Variables */
 :root {
-  --bg-color: #0f172a;
-  --panel-bg: rgba(30, 41, 59, 0.7);
-  --panel-border: rgba(255, 255, 255, 0.1);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  /* Warm Earthy Palette */
+  --bg-color: #f5ede3; /* Soft Beige */
+  --panel-bg: #ffffff; /* Crisp White Cards */
+  --panel-border: rgba(45, 36, 30, 0.08);
+  --text-primary: #2d241e; /* Dark Cocoa */
+  --text-secondary: #7a6e65; /* Muted Taupe */
   
-  --accent-blue: #3b82f6;
-  --accent-green: #10b981;
-  --accent-orange: #f59e0b;
-  --accent-red: #ef4444;
-  --accent-purple: #8b5cf6;
+  --accent-blue: #3e5c76; /* Muted Slate Blue */
+  --accent-green: #6b705c; /* Sage Olive */
+  --accent-orange: #c08c5d; /* Warm Earthy Tan (Primary Accent) */
+  --accent-red: #a44a3f; /* Deep Earthy Red */
+  --accent-purple: #7b506f; /* Muted Plum */
   
-  --btn-radius: 12px;
-  --panel-radius: 16px;
+  --btn-radius: 50px; /* Full Rounded pills */
+  --panel-radius: 32px; /* Highly rounded cards */
   
   --font-main: 'Outfit', sans-serif;
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-  --transition-fast: 0.2s ease;
-  --transition-bounce: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --glass-shadow: 0 10px 40px rgba(45, 36, 30, 0.08); /* Soft shadows */
+  --transition-fast: 0.3s ease;
+  --transition-bounce: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Base Reset */
@@ -35,8 +36,8 @@ body {
   display: flex;
   justify-content: center;
   min-height: 100vh;
-  /* Add subtle gradient mesh */
-  background: radial-gradient(circle at top left, #1e1b4b 0%, #0f172a 100%);
+  /* Soft warm gradient mesh */
+  background: radial-gradient(circle at top left, #f5ede3 0%, #ede0d4 100%);
 }
 
 #app {
@@ -51,17 +52,27 @@ body {
 
 /* Header */
 .app-header {
-  padding: 1.5rem;
+  padding: 1.5rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  border-bottom: 1px solid var(--panel-border);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  background: var(--panel-bg);
+  background: #1a1a1a; /* Dark top section */
+  color: white;
   z-index: 10;
-  position: sticky;
-  top: 0;
+  position: relative;
+  /* Wavy SVG divider at bottom */
+  margin-bottom: 2rem;
+}
+
+.app-header::after {
+  content: "";
+  position: absolute;
+  bottom: -49px;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: #1a1a1a;
+  clip-path: ellipse(50% 100% at 50% 0%);
 }
 
 .header-logo {
@@ -145,23 +156,50 @@ main {
 }
 
 /* Common Product Card Glassmorphism layout */
+/* Item Cards Refinement */
 .glass-panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--panel-border);
   border-radius: var(--panel-radius);
   box-shadow: var(--glass-shadow);
   overflow: hidden;
+  transition: var(--transition-fast);
 }
 
-/* Customer Item Card */
-.product-card, .vendor-item-card {
-  padding: 1.25rem;
+.product-card {
+  padding: 0; /* Remove padding to allow image to bleed */
+  background: var(--panel-bg);
+  cursor: pointer;
+}
+
+.product-visual-container {
+  height: 200px;
+  background: #f8f1ea;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  transition: var(--transition-fast);
+  align-items: center;
+  justify-content: center;
+  border-bottom-left-radius: var(--panel-radius);
+  border-bottom-right-radius: var(--panel-radius);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-info-top {
+    padding: 1.5rem;
+    padding-bottom: 0.5rem;
+    text-align: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.reserve-btn-container {
+    padding: 0 1.5rem 1.5rem 1.5rem;
 }
 
 .product-card:hover {
@@ -513,8 +551,8 @@ main {
   z-index: 999;
   backdrop-filter: blur(5px);
 }
-.modal-overlay.hidden {
-  display: none;
+.modal-overlay.hidden, .hidden {
+  display: none !important;
 }
 .modal-content {
   width: 90%;

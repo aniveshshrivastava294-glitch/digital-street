@@ -21,6 +21,7 @@ Digital Street is a modern neighborhood marketplace connecting local vendors dir
 
 ### 🏭 Vendor Dashboard
 - **Add & Manage Products**: List items with prices, images/icons, and availability status.
+- **NEW: Camera Capture**: Vendors can now take a live product photo directly from the dashboard using their device camera during the "Add Product" flow.
 - **Flash Sales**: Toggle a flash sale to offer 20% off and attract more buyers.
 - **Verify Pickups**: Customers receive a 4-digit pickup code to show the vendor when collecting their order.
 - **Live Income Tracking**: Vendor's total earned income updates in real-time after every verified sale.
@@ -30,7 +31,11 @@ Digital Street is a modern neighborhood marketplace connecting local vendors dir
 - **Orders Table**: View the latest transactions with status labels (PENDING / COMPLETED / CANCELLED).
 - **Customer & Vendor Directory**: Full tables showing spending, balances, and income per user.
 - **Support Tickets**: View and resolve issues raised by customers.
-- **Secured Access**: Admin login is protected via `Anivesh@123`.
+- **Secured Access**: Admin login uses `admin@admin.com` with password `Anivesh@123`.
+
+### 🎨 Aesthetic: Warm Organic Theme
+- **Premium Design**: Transitioned from a dark theme to a warm, earthy, and elegant aesthetic (Beige/Cream/Cocoa).
+- **Modern UI**: Featuring wavy section dividers, cushioned product cards (`32px` radius), and high-quality artisanal imagery.
 
 ---
 
@@ -104,7 +109,7 @@ Visit `http://localhost:3000` in your browser.
 
 | Role    | Login Details                          |
 |---------|----------------------------------------|
-| Admin   | Password: `Anivesh@123` (via Enterprise Portal) |
+| Admin   | Email: `admin@admin.com` <br> Password: `Anivesh@123` |
 | Customer | Sign up with any email / password     |
 | Vendor  | Sign up with Shop Name & Phone Number |
 
