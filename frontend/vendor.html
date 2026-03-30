@@ -135,6 +135,28 @@
         </div>
     </div>
 
+    <!-- Customer Support Modal (Reused) -->
+    <div id="support-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel" style="background: var(--bg-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Support Service</h2>
+                <button onclick="closeSupportModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div class="glass-panel" style="padding: 1rem; background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--accent-blue);">
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>Support?</strong> Reach out to the Digital Street help desk center.</p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="mail" style="width:12px; height:12px;"></i> support@digitalstreet.com</p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="phone" style="width:12px; height:12px;"></i> +91 000 111 2222</p>
+                </div>
+                <div class="input-group">
+                    <label>Explain your issue</label>
+                    <textarea id="support-issue" class="modal-input" style="min-height: 80px; resize: vertical;" placeholder="Tell us what went wrong..."></textarea>
+                </div>
+                <button class="primary-btn huge-btn" style="background: var(--accent-blue);" onclick="submitSupportTicket()">Submit Support Ticket</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Complete Pickup Modal -->
     <div id="pickup-modal" class="modal-overlay hidden">
         <div class="modal-content glass-panel" style="background: var(--bg-color);">
@@ -155,6 +177,11 @@
     </div>
 
     <!-- Notification Toast Container -->
+    <!-- Support Button (FAB) -->
+    <button class="support-fab" onclick="openSupportModal()" title="Support Helpline">
+        <i data-lucide="life-buoy"></i>
+    </button>
+
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Scripts -->

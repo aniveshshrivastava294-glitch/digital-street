@@ -603,3 +603,37 @@ main {
   filter: brightness(1.1);
 }
 
+/* Support FAB (Floating Action Button) */
+.support-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  background: var(--accent-blue);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 998;
+  transition: var(--transition-bounce);
+  border: none;
+}
+
+.support-fab:hover {
+  transform: scale(1.1) rotate(5deg);
+  background: var(--accent-orange);
+}
+
+.support-fab i {
+  width: 24px;
+  height: 24px;
+}
+
+/* Toast Z-index correction */
+.toast-container {
+  z-index: 1001; 
+}

@@ -5,7 +5,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { 
     collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, 
-    getDoc, increment, arrayUnion, arrayRemove, query, where, serverTimestamp 
+    getDoc, increment, arrayUnion, arrayRemove, query, where, serverTimestamp,
+    addDoc, orderBy
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 let storeItems = [];
@@ -16,6 +17,7 @@ let vendorsArray = [];
 let currentUser = null; 
 let searchQuery = ""; 
 let cameraStream = null;
+let supportTicketsArray = []; // New state for dedicated collection
 
 // 🚀 Real-time Firestore Listeners
 function initFirebaseListeners() {
@@ -57,6 +59,13 @@ function initFirebaseListeners() {
                 updateHeaderUI();
             }
         }
+        reRenderActive();
+    });
+    
+    // 5. Listen to Support Tickets (Dedicated Collection)
+    const ticketsQuery = query(collection(db, "supportTickets"), orderBy("timestamp", "desc"));
+    onSnapshot(ticketsQuery, (snapshot) => {
+        supportTicketsArray = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         reRenderActive();
     });
 }
@@ -195,13 +204,11 @@ window.submitSupportTicket = async function() {
     };
     
     try {
-        await updateDoc(doc(db, "config", "platformMetrics"), {
-            supportTickets: arrayUnion(ticket)
-        });
+        await addDoc(collection(db, "supportTickets"), ticket);
         showToast("Ticket Submitted!");
         document.getElementById("support-issue").value = "";
         closeSupportModal();
-    } catch (e) { showToast("Error submitting ticket."); }
+    } catch (e) { showToast("Error submitting ticket."); console.error(e); }
 }
 
 /* ================= CUSTOMER VIEW ================= */
@@ -374,7 +381,7 @@ function renderAdminView() {
     }
 
     if(suppBody) {
-        suppBody.innerHTML = (platformMetrics.supportTickets || []).map(t => `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 1rem;"><strong>${t.user}</strong></td><td style="padding: 1rem; color: var(--text-secondary);">${t.issue}</td><td style="padding: 1rem; text-align:right;"><button class="logout-btn" onclick="resolveTicket(${t.id})">Resolve</button></td></tr>`).join("");
+        suppBody.innerHTML = supportTicketsArray.map(t => `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 1rem;"><strong>${t.user}</strong></td><td style="padding: 1rem; color: var(--text-secondary);">${t.issue}</td><td style="padding: 1rem; text-align:right;"><button class="logout-btn" onclick="resolveTicket('${t.id}')">Resolve</button></td></tr>`).join("");
     }
 
     if(custBody) {
@@ -387,9 +394,10 @@ function renderAdminView() {
 }
 
 window.resolveTicket = async function(id) {
-    const freshTickets = platformMetrics.supportTickets.filter(t => t.id !== id);
-    await updateDoc(doc(db, "config", "platformMetrics"), { supportTickets: freshTickets });
-    showToast("Ticket Resolved.");
+    try {
+        await deleteDoc(doc(db, "supportTickets", id));
+        showToast("Ticket Resolved.");
+    } catch (e) { showToast("Error resolving ticket."); }
 }
 
 /* ================= PICKUP & RESERVE ================= */
