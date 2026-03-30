@@ -132,4 +132,4 @@ Vendor income updated, Platform revenue updated
 
 ---
 
-*Built with ❤️ for neighborhood commerce.*
+
