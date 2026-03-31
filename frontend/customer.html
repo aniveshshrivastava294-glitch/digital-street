@@ -20,7 +20,10 @@
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-orange); display: flex; align-items: center; justify-content: center; color: white;">
                         <i data-lucide="shopping-bag" style="width:20px; height:20px"></i>
                     </div>
-                    <h1 style="font-size: 1.5rem; color: white; margin:0;">Digital Street</h1>
+                    <div>
+                        <h1 id="user-display-name" style="font-size: 1.25rem; color: white; margin:0;">Loading...</h1>
+                        <small style="color:rgba(255,255,255,0.7); font-size:0.7rem;">Street Customer</small>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <button class="primary-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 0.85rem;" onclick="logout()">
@@ -32,8 +35,8 @@
 
         <!-- Hero Section -->
         <div class="hero-section" style="margin-top: 4rem; padding: 0 2rem; margin-bottom: 3rem;">
-            <div class="glass-panel" style="position: relative; height: 350px; display: flex; align-items: center; padding: 3rem; background: url('./assets/hero_goods.png') center/cover no-repeat; border: none; border-radius: var(--panel-radius);">
-                <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 100%); border-radius: var(--panel-radius);"></div>
+            <div class="glass-panel" style="position: relative; height: 350px; display: flex; align-items: center; padding: 3rem; background: linear-gradient(135deg, #1a1a1a 0%, #2d241e 100%); border: none; border-radius: var(--panel-radius);">
+                <div style="position: absolute; inset: 0; background: radial-gradient(circle at bottom right, rgba(192, 140, 93, 0.2) 0%, transparent 70%); border-radius: var(--panel-radius);"></div>
                 <div style="position: relative; z-index: 1; max-width: 400px; color: white;">
                     <h2 style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem;">FRESH FROM THE STREET</h2>
                     <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 2rem;">Connecting you with the finest local artisans and fresh neighborhood goods.</p>

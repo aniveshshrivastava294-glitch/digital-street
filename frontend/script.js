@@ -387,7 +387,7 @@ function renderVendorView() {
         const activeHolds = (item.reservedTokens || []).length;
         const btnStyle = activeHolds > 0 ? "background: var(--accent-orange); color: white;" : "opacity:0.3; cursor:not-allowed;";
 
-        card.innerHTML = `<div style="display:flex; gap:1rem; align-items:center;">${visualHTML}<div class="product-info-top" style="flex-direction: column; flex:1;"><h3>${item.title}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${activeHolds} active</span></div></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock('${item.id}')">${toggleText}</button><button class="huge-btn" onclick="toggleFlashSale('${item.id}')">${item.flashSaleActive ? 'End Flash' : 'Flash Sale'}</button><button class="huge-btn" style="${btnStyle}" onclick="${activeHolds > 0 ? `openPickupModal('${item.id}')` : `showNoHoldsToast()`}"><i data-lucide="shield-check"></i> Verify Pickup</button></div>`;
+        card.innerHTML = `<div style="display:flex; gap:1rem; align-items:center;">${visualHTML}<div class="product-info-top" style="flex-direction: column; flex:1;"><h3>${item.title}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${activeHolds} active</span></div></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock('${item.id}')">${toggleText}</button><button class="huge-btn" onclick="toggleFlashSale('${item.id}')">${item.flashSaleActive ? 'End Flash' : 'Flash Sale'}</button><button class="huge-btn" style="${btnStyle}" ${activeHolds > 0 ? '' : 'disabled'} onclick="${activeHolds > 0 ? `openPickupModal('${item.id}')` : `showNoHoldsToast()`}"><i data-lucide="shield-check"></i> Verify Pickup</button></div>`;
         list.appendChild(card);
     });
     lucide.createIcons();
@@ -468,12 +468,6 @@ window.confirmPickup = async function() {
         });
 
         // 2. Update Order Status
-        const orderQuery = query(collection(db, "orders"), 
-            where("item_id", "==", itemId), 
-            where("pickup_code", "==", inputCode),
-            where("status", "==", "PENDING")
-        );
-        // Normally you'd get the ID but let's use the code mapping
         const matchingOrders = ordersArray.filter(o => o.item_id === itemId && o.pickup_code === inputCode && o.status === 'PENDING');
         if(matchingOrders.length > 0) {
             await updateDoc(doc(db, "orders", matchingOrders[0].id), {
@@ -515,9 +509,8 @@ window.reserveItem = async function(id) {
             reservedTokens: arrayUnion(token)
         });
 
-        // 3. Create a Permanent Order Record
-        const orderId = "order_" + Date.now();
-        await setDoc(doc(db, "orders", orderId), {
+        // 3. Create a Permanent Order Record (Let Firestore generate ID)
+        await addDoc(collection(db, "orders"), {
             item_id: id,
             title: item.title,
             price: item.price,
