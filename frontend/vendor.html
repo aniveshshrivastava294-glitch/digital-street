@@ -45,9 +45,12 @@
                     </div>
                 </div>
 
-                <div class="vendor-top-bar" style="margin-bottom: 1.5rem; display:flex; justify-content: space-between; align-items:center;">
-                    <div>
+                <div class="vendor-top-bar" style="margin-bottom: 1.5rem; display:flex; justify-content: space-between; align-items:center; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
                         <h2>Store Management</h2>
+                        <div id="shop-status-toggle-container">
+                            <!-- Populated via JS -->
+                        </div>
                     </div>
                     <button class="primary-btn huge-btn" id="btn-add-stock" style="min-width: unset; padding: 0.5rem 1rem; background: var(--accent-blue);" onclick="addNewItem()"><i data-lucide="plus"></i> Add Product</button>
                 </div>

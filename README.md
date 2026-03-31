@@ -15,12 +15,14 @@ Digital Street is a modern neighborhood marketplace connecting local vendors dir
 ### 👤 Customer Experience
 - **Digital E-Wallet**: Top up your balance and spend it on local goods.
 - **Buy & Track Orders**: Every purchase is recorded in the cloud with a unique pickup code.
+- **Order Availability**: See real-time indicator (`LIVE` / `OFF`) for every shop. The "Buy Now" button is automatically disabled if the shop is closed.
 - **Order Cancellation & Refund**: Cancel a pending order and get an instant wallet refund.
 - **Flash Sale Deals**: See live discounted items highlighted in a banners section.
 - **Direct Vendor Contact**: Vendor phone numbers are shown on every product card.
 
 ### 🏭 Vendor Dashboard
 - **Add & Manage Products**: List items with prices, images/icons, and availability status.
+- **NEW: Real-time Shop Status**: Vendors can now toggle their entire shop "LIVE" or "OFF" with a single click. When set to "OFF", customers are notified and cannot place new orders.
 - **NEW: Camera Capture**: Vendors can now take a live product photo directly from the dashboard using their device camera during the "Add Product" flow.
 - **Flash Sales**: Toggle a flash sale to offer 20% off and attract more buyers.
 - **Verify Pickups**: Customers receive a 4-digit pickup code to show the vendor when collecting their order.

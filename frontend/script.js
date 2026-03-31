@@ -259,7 +259,15 @@ function renderCustomerView() {
     filteredItems.forEach(item => {
         const card = document.createElement("div");
         card.className = "product-card glass-panel";
-        const vendorContactHTML = `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${item.vendorName}</div>`;
+        
+        // Find vendor status from vendorsArray
+        const vendor = vendorsArray.find(v => v.email === item.vendorEmail);
+        const isShopLive = vendor ? (vendor.isLive !== false) : true; // Default to true
+        const shopStatusHTML = isShopLive 
+            ? `<span class="badge badge-live" style="font-size:0.6rem; padding: 0.1rem 0.4rem;"><div class="status-dot live" style="width:6px; height:6px;"></div> LIVE</span>`
+            : `<span class="badge badge-off" style="font-size:0.6rem; padding: 0.1rem 0.4rem;"><div class="status-dot off" style="width:6px; height:6px;"></div> OFF</span>`;
+
+        const vendorContactHTML = `<div style="display:flex; align-items:center; gap:0.4rem; justify-content:center; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${item.vendorName} ${shopStatusHTML}</div>`;
 
         const getValidIcon = (name) => {
             const map = { 'tulips': 'flower', 'sunflower': 'flower', 'flower-2': 'flower', 'shop': 'store' };
@@ -277,8 +285,13 @@ function renderCustomerView() {
         
         let reserveHTML = "";
         if (item.status === 'IN_STOCK') {
-            reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; background:var(--accent-orange); color:white;" onclick="reserveItem('${item.id}')">BUY NOW</button>`;
-            if(currentUser && (currentUser.walletBalance || 0) < item.price) reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>REFILL WALLET</button>`;
+            if (!isShopLive) {
+                reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>SHOP CLOSED</button>`;
+            } else if(currentUser && (currentUser.walletBalance || 0) < item.price) {
+                reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>REFILL WALLET</button>`;
+            } else {
+                reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; background:var(--accent-orange); color:white;" onclick="reserveItem('${item.id}')">BUY NOW</button>`;
+            }
         } else {
             reserveHTML = `<button class="btn-reserve" style="background:#ddd; color:#999;" disabled>SOLD OUT</button>`;
         }
@@ -321,9 +334,38 @@ window.confirmAddFunds = async function() {
 }
 
 /* ================= VENDOR VIEW ================= */
+window.toggleShopStatus = async function() {
+    if (!currentUser) return;
+    const currentStatus = currentUser.isLive !== false;
+    const newStatus = !currentStatus;
+    
+    try {
+        await updateDoc(doc(db, "users", currentUser.email), {
+            isLive: newStatus
+        });
+        showToast(`Shop is now ${newStatus ? 'LIVE' : 'OFF'}`);
+    } catch (e) {
+        showToast("Error updating shop status.");
+        console.error(e);
+    }
+}
+
 function renderVendorView() {
     const salesElem = document.getElementById("vendor-daily-sales");
     if (salesElem && currentUser) salesElem.innerText = formatCurrency(currentUser.totalGenerated || 0);
+
+    // Render Shop Status Toggle
+    const toggleContainer = document.getElementById("shop-status-toggle-container");
+    if (toggleContainer && currentUser) {
+        const isLive = currentUser.isLive !== false;
+        toggleContainer.innerHTML = `
+            <button class="status-toggle-btn ${isLive ? 'live' : 'off'}" onclick="toggleShopStatus()">
+                <div class="status-dot ${isLive ? 'live' : 'off'}"></div>
+                Shop: ${isLive ? 'LIVE' : 'OFF'}
+            </button>
+        `;
+    }
+
     const list = document.getElementById("vendor-product-list");
     if (!list) return;
     list.innerHTML = "";

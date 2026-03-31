@@ -258,6 +258,8 @@ main {
 }
 .badge-stock { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
 .badge-sold { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+.badge-live { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+.badge-off { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
 .badge-timer { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
 .badge-flash { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); animation: pulse 2s infinite; }
 
@@ -325,7 +327,41 @@ main {
   padding: 1rem;
   border-radius: var(--panel-radius);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 2rem;
 }
+
+.status-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--btn-radius);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition-bounce);
+  border: 1px solid var(--panel-border);
+  background: white;
+  color: var(--text-primary);
+}
+
+.status-toggle-btn.live {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+
+.status-toggle-btn.off {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.status-dot.live { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+.status-dot.off { background: var(--accent-red); }
 .bot-status {
   display: flex;
   align-items: center;
