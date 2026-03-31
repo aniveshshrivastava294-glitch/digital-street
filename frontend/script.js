@@ -217,9 +217,12 @@ function renderCustomerView() {
     if (balanceElem && currentUser) balanceElem.innerText = formatCurrency(currentUser.walletBalance || 0);
 
     const list = document.getElementById("customer-product-list");
+    const ordersList = document.getElementById("customer-orders-list");
     const banner = document.getElementById("offers-banner");
     const bannerContainer = document.getElementById("offers-banner-container");
     if (!list) return;
+
+    // Render Products logic (Keep as is)
 
     const filteredItems = storeItems.filter(item => {
         const matchesSearch = item.title.toLowerCase().includes(searchQuery) || 
@@ -287,10 +290,19 @@ function renderCustomerView() {
         if (item.status === 'IN_STOCK') {
             if (!isShopLive) {
                 reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>SHOP CLOSED</button>`;
-            } else if(currentUser && (currentUser.walletBalance || 0) < item.price) {
-                reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>REFILL WALLET</button>`;
             } else {
-                reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; background:var(--accent-orange); color:white;" onclick="reserveItem('${item.id}')">BUY NOW</button>`;
+                // Payment Method Selector
+                const balance = currentUser?.walletBalance || 0;
+                const canAffordWallet = balance >= item.price;
+                
+                reserveHTML = `
+                    <div class="payment-selector" style="display:flex; background:rgba(255,255,255,0.05); border-radius:8px; padding:2px; margin-bottom:0.75rem;">
+                        <button id="pay-wallet-${item.id}" class="pay-toggle-btn active" onclick="setPaymentMethod('${item.id}', 'WALLET')">Wallet</button>
+                        <button id="pay-cash-${item.id}" class="pay-toggle-btn" onclick="setPaymentMethod('${item.id}', 'CASH')">Cash</button>
+                    </div>
+                    <button id="buy-btn-${item.id}" class="primary-btn" style="width:100%; justify-content:center; background:var(--accent-orange); color:white;" onclick="reserveItem('${item.id}')">BUY NOW</button>
+                    <div id="wallet-warning-${item.id}" style="font-size:0.65rem; color:var(--accent-red); margin-top:0.4rem; text-align:center; height:12px; ${canAffordWallet ? 'display:none;' : ''}">Low balance. Please top up or use Cash.</div>
+                `;
             }
         } else {
             reserveHTML = `<button class="btn-reserve" style="background:#ddd; color:#999;" disabled>SOLD OUT</button>`;
@@ -306,6 +318,48 @@ function renderCustomerView() {
         }
         list.appendChild(card);
     });
+
+    // Populate My Orders Section
+    if (ordersList) {
+        const myOrders = ordersArray.filter(o => o.customerEmail === currentUser?.email);
+        if (myOrders.length === 0) {
+            ordersList.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 2.5rem; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; color:var(--text-secondary); background: rgba(255,255,255,0.02);">You haven't placed any orders yet.</div>`;
+        } else {
+            ordersList.innerHTML = myOrders.slice().reverse().map(order => {
+                let statusColor = "var(--text-secondary)";
+                if (order.status === 'COMPLETED') statusColor = "var(--accent-green)";
+                if (order.status === 'CANCELLED') statusColor = "var(--accent-red)";
+                
+                const isPending = order.status === 'PENDING';
+                const otpBlock = isPending 
+                    ? `<div style="margin-top: 1rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 8px; text-align:center; border: 1px solid rgba(59, 130, 246, 0.3);">
+                         <small style="text-transform:uppercase; font-size:0.6rem; color:var(--accent-blue); display:block; margin-bottom:0.25rem; font-weight:700;">Pickup OTP</small>
+                         <span style="font-size: 1.5rem; font-weight:800; letter-spacing:4px; color:white;">${order.pickup_code}</span>
+                       </div>`
+                    : `<div style="margin-top: 1rem; color: ${statusColor}; font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; text-align:center; padding: 0.5rem; background:rgba(255,255,255,0.05); border-radius:8px;">${order.status}</div>`;
+
+                const cancelBtn = isPending 
+                    ? `<button class="primary-btn" style="background: rgba(239, 68, 68, 0.1); color: var(--accent-red); font-size:0.75rem; border:1px solid rgba(239, 68, 68, 0.2); padding:0.5rem; width:100%; height:auto; margin-top:1rem; border-radius:8px;" onclick="cancelOrder('${order.item_id}', '${order.pickup_code}')">Cancel & Refund</button>`
+                    : "";
+
+                return `
+                <div class="glass-panel" style="padding: 1.5rem; display:flex; flex-direction:column; justify-content:space-between; border-color: ${isPending ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'}; transition: transform 0.3s ease;">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 0.5rem;">
+                            <h4 style="margin:0; font-size:1.1rem; font-weight:700;">${order.title}</h4>
+                            <span style="font-weight:800; color:var(--accent-green); font-size:1rem;">${formatCurrency(order.price)}</span>
+                        </div>
+                        <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
+                            <span style="display:flex; align-items:center; gap:0.3rem;"><i data-lucide="store" style="width:12px; height:12px;"></i> ${order.vendor}</span>
+                            <span style="display:flex; align-items:center; gap:0.3rem; margin-top:0.2rem;"><i data-lucide="credit-card" style="width:12px; height:12px;"></i> Paid via: <strong style="color:var(--accent-orange); ml-1">${order.paymentMethod || 'WALLET'}</strong></span>
+                        </div>
+                        ${otpBlock}
+                    </div>
+                    ${cancelBtn}
+                </div>`;
+            }).join("");
+        }
+    }
     lucide.createIcons(); 
 }
 
@@ -323,6 +377,11 @@ window.confirmAddFunds = async function() {
     const depositAmt = parseFloat(input.value.replace(/[^0-9.]/g, ''));
     
     if (isNaN(depositAmt) || depositAmt <= 0 || !currentUser) return showToast("Invalid amount.");
+
+    const currentBalance = currentUser.walletBalance || 0;
+    if (currentBalance + depositAmt > 10000) {
+        return showToast(`Limit Exceeded! Maximum balance allowed is ₹10,000. Your current balance is ${formatCurrency(currentBalance)}.`);
+    }
     
     try {
         await updateDoc(doc(db, "users", currentUser.email), {
@@ -413,10 +472,14 @@ function renderAdminView() {
             if(order.status === 'COMPLETED') statusColor = "var(--accent-green)";
             if(order.status === 'CANCELLED') statusColor = "var(--accent-red)";
             
+            const methodHTML = order.paymentMethod === 'CASH' 
+                ? `<span style="font-size:0.6rem; background:rgba(192, 140, 93, 0.15); color:var(--accent-orange); padding:0.1rem 0.3rem; border-radius:4px; font-weight:700;">CASH</span>`
+                : `<span style="font-size:0.6rem; background:rgba(59, 130, 246, 0.15); color:var(--accent-blue); padding:0.1rem 0.3rem; border-radius:4px; font-weight:700;">WALLET</span>`;
+
             return `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <td style="padding: 0.75rem;">${time}</td>
                 <td style="padding: 0.75rem;">${order.title}<br><small style="color:${statusColor}">${order.status}</small></td>
-                <td style="padding: 0.75rem;">${order.vendor}</td>
+                <td style="padding: 0.75rem;">${order.vendor}<br>${methodHTML}</td>
                 <td style="padding: 0.75rem; color: var(--accent-green); font-weight:700;">${formatCurrency(order.price)}</td>
             </tr>`;
         }).join("");
@@ -485,31 +548,68 @@ window.confirmPickup = async function() {
         const freshTokens = item.reservedTokens.filter((_, idx) => idx !== tokenIdx);
         await updateDoc(doc(db, "storeItems", itemId), { reservedTokens: freshTokens });
         
-        showToast("Pickup Verified! Income Stored.");
+        const methodNote = matchingOrders[0]?.paymentMethod === 'CASH' ? " Collect Cash Now!" : " Paid via Wallet.";
+        showToast("Pickup Verified!" + methodNote);
         closePickupModal();
     } else { showToast("Invalid Code!"); }
 }
 
+let selectedPaymentMethods = {}; // State for UI toggles
+
+window.setPaymentMethod = function(itemId, method) {
+    selectedPaymentMethods[itemId] = method;
+    const item = storeItems.find(i => i.id === itemId);
+    const buyBtn = document.getElementById(`buy-btn-${itemId}`);
+    const walletWarning = document.getElementById(`wallet-warning-${itemId}`);
+    const walletBtn = document.getElementById(`pay-wallet-${itemId}`);
+    const cashBtn = document.getElementById(`pay-cash-${itemId}`);
+    
+    // UI Feedback
+    if(walletBtn) walletBtn.classList.toggle('active', method === 'WALLET');
+    if(cashBtn) cashBtn.classList.toggle('active', method === 'CASH');
+
+    if(method === 'WALLET') {
+        const canAfford = (currentUser.walletBalance || 0) >= item.price;
+        if(buyBtn) {
+            buyBtn.disabled = !canAfford;
+            buyBtn.style.opacity = canAfford ? '1' : '0.5';
+        }
+        if(walletWarning) walletWarning.style.display = canAfford ? 'none' : 'block';
+    } else {
+        // Cash always allowed
+        if(buyBtn) {
+            buyBtn.disabled = false;
+            buyBtn.style.opacity = '1';
+        }
+        if(walletWarning) walletWarning.style.display = 'none';
+    }
+}
+
 window.reserveItem = async function(id) {
     const item = storeItems.find(i => i.id === id);
-    if (!item || (currentUser.walletBalance || 0) < item.price) return showToast("Insufficient Balance!");
+    const method = selectedPaymentMethods[id] || 'WALLET';
+    
+    if (!item) return;
+    if (method === 'WALLET' && (currentUser.walletBalance || 0) < item.price) return showToast("Insufficient Balance!");
     
     const pickupCode = generateHoldCode();
     const token = { code: pickupCode, expires: Date.now() + (30 * 60 * 1000), ownerEmail: currentUser.email };
     
     try {
-        // 1. Deduct from Customer
-        await updateDoc(doc(db, "users", currentUser.email), {
-            walletBalance: increment(-item.price),
-            totalSpent: increment(item.price)
-        });
+        // 1. Deduct from Customer (Only if WALLET)
+        if(method === 'WALLET') {
+            await updateDoc(doc(db, "users", currentUser.email), {
+                walletBalance: increment(-item.price),
+                totalSpent: increment(item.price)
+            });
+        }
 
         // 2. Add Reservation to Item
         await updateDoc(doc(db, "storeItems", id), {
             reservedTokens: arrayUnion(token)
         });
 
-        // 3. Create a Permanent Order Record (Let Firestore generate ID)
+        // 3. Create a Permanent Order Record
         await addDoc(collection(db, "orders"), {
             item_id: id,
             title: item.title,
@@ -519,11 +619,12 @@ window.reserveItem = async function(id) {
             customerEmail: currentUser.email,
             customerName: currentUser.name,
             pickup_code: pickupCode,
+            paymentMethod: method, // NEW FIELD
             status: 'PENDING',
             timestamp: Date.now()
         });
 
-        showToast("Purchase Successful! Order Recorded.");
+        showToast(method === 'WALLET' ? "Purchase Successful!" : "Reserved for Cash Pickup!");
     } catch(e) { showToast("Reservation failed."); console.error(e); }
 }
 
@@ -533,12 +634,17 @@ window.cancelOrder = async function(itemId, code) {
     const token = item.reservedTokens.find(t => t.code === code && t.ownerEmail === currentUser.email);
     if(!token) return;
 
+    // Find the specific order to check payment method
+    const order = ordersArray.find(o => o.item_id === itemId && o.pickup_code === code && o.customerEmail === currentUser.email);
+
     try {
-        // 1. Refund Customer
-        await updateDoc(doc(db, "users", currentUser.email), {
-            walletBalance: increment(item.price),
-            totalSpent: increment(-item.price)
-        });
+        // 1. Refund Customer (Only if WALLET)
+        if(order && order.paymentMethod === 'WALLET') {
+            await updateDoc(doc(db, "users", currentUser.email), {
+                walletBalance: increment(item.price),
+                totalSpent: increment(-item.price)
+            });
+        }
 
         // 2. Remove Token from Item
         await updateDoc(doc(db, "storeItems", itemId), {
@@ -546,15 +652,14 @@ window.cancelOrder = async function(itemId, code) {
         });
 
         // 3. Update Order Status
-        const matchingOrders = ordersArray.filter(o => o.item_id === itemId && o.pickup_code === code && o.customerEmail === currentUser.email);
-        if(matchingOrders.length > 0) {
-            await updateDoc(doc(db, "orders", matchingOrders[0].id), {
+        if(order) {
+            await updateDoc(doc(db, "orders", order.id), {
                 status: 'CANCELLED',
                 cancelledAt: Date.now()
             });
         }
 
-        showToast("Order Cancelled & Refunded.");
+        showToast(order?.paymentMethod === 'WALLET' ? "Order Cancelled & Refunded." : "Cash Order Cancelled.");
     } catch(e) { showToast("Cancellation failed."); }
 }
 

@@ -823,3 +823,29 @@ main {
 .f-13 { top: 75%; right: 15%; animation: floatAround 48s infinite linear; }
 .f-14 { top: 50%; right: 5%; animation: floatReverse 33s infinite linear; }
 .f-15 { top: 5%; left: 35%; animation: floatSway 36s infinite ease-in-out; }
+
+/* Payment Selector Styles */
+.pay-toggle-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.pay-toggle-btn.active {
+  background: var(--accent-orange);
+  color: white;
+  box-shadow: 0 2px 8px rgba(192, 140, 93, 0.3);
+}
+
+.pay-toggle-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-primary);
+}
