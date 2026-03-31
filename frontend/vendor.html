@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+    <div class="mesh-bg"></div>
     <div id="app" class="app-container">
         
         <!-- App Navigation Header -->
@@ -35,27 +36,27 @@
         <main id="main-content">
             
             <!-- SECTION: VENDOR DASHBOARD -->
-            <section id="vendor-view" class="view-section active">
+            <section id="vendor-view" class="view-section active stagger-in">
                 
                 <!-- Vendor Sales Analytics -->
                 <div class="glass-panel" style="padding: 2.5rem; display: flex; justify-content: space-between; align-items: center; background: #fffcf9; border: 1px solid var(--panel-border); margin-top: 2rem; margin-bottom: 3rem;">
                     <div>
                         <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="trending-up" style="width:16px; height:16px; color: var(--accent-orange);"></i> Total Store Revenue</div>
-                        <div id="vendor-daily-sales" style="font-size: 3rem; font-weight: 800; color: var(--text-primary);">₹0.00</div>
+                        <div id="vendor-daily-sales" style="font-size: 3.5rem; font-weight: 800; color: var(--text-primary);">₹0.00</div>
                     </div>
                 </div>
 
-                <div class="vendor-top-bar" style="margin-bottom: 1.5rem; display:flex; justify-content: space-between; align-items:center; gap: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <h2>Store Management</h2>
+                <div class="vendor-top-bar" style="margin-bottom: 2rem; display:flex; justify-content: space-between; align-items:center; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <h2 style="font-size: 1.8rem; font-weight: 800;">Store Management</h2>
                         <div id="shop-status-toggle-container">
                             <!-- Populated via JS -->
                         </div>
                     </div>
-                    <button class="primary-btn huge-btn" id="btn-add-stock" style="min-width: unset; padding: 0.5rem 1rem; background: var(--accent-blue);" onclick="addNewItem()"><i data-lucide="plus"></i> Add Product</button>
+                    <button class="primary-btn huge-btn" id="btn-add-stock" style="min-width: unset; padding: 1rem 2rem; background: var(--accent-blue); border-radius: 12px;" onclick="addNewItem()"><i data-lucide="plus"></i> Add Product</button>
                 </div>
                 
-                <div class="vendor-products-list" id="vendor-product-list">
+                <div class="vendor-products-list stagger-in" id="vendor-product-list">
                     <!-- Products rendered via JS -->
                 </div>
             </section>

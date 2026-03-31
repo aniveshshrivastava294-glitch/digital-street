@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
 </head>
-<body style="background: var(--bg-color);">
+<body>
+    <div class="mesh-bg"></div>
     <div id="app" class="app-container">
         
         <!-- Admin Header -->
@@ -31,17 +32,17 @@
             </div>
         </header>
 
-        <main style="display: flex; flex-direction: column; gap: 2rem; padding-top: 2rem;">
+        <main class="stagger-in" style="display: flex; flex-direction: column; gap: 2.5rem; padding-top: 2rem;">
             
             <!-- Overall Stats -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;">
-                <div class="glass-panel" style="padding: 2.5rem; background: #fffcf9; border: 1px solid var(--panel-border);">
-                    <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Total Platform Revenue</div>
-                    <div id="admin-total-income" style="font-size: 3rem; font-weight: 800; color: var(--accent-orange);">₹0.00</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-top: 2rem;">
+                <div class="glass-panel" style="padding: 3rem; background: white; border: 1px solid rgba(0,0,0,0.03); border-radius: 40px;">
+                    <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: 1px;">Total Platform Revenue</div>
+                    <div id="admin-total-income" style="font-size: 4rem; font-weight: 900; color: var(--accent-orange); letter-spacing: -2px;">₹0.00</div>
                 </div>
-                <div class="glass-panel" style="padding: 2.5rem; background: #fffcf9; border: 1px solid var(--panel-border);">
-                    <div style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem;">Total Orders Processed</div>
-                    <div id="admin-total-sold" style="font-size: 3rem; font-weight: 800; color: var(--accent-orange);">0</div>
+                <div class="glass-panel" style="padding: 3rem; background: white; border: 1px solid rgba(0,0,0,0.03); border-radius: 40px;">
+                    <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: 1px;">Total Orders Processed</div>
+                    <div id="admin-total-sold" style="font-size: 4rem; font-weight: 900; color: var(--accent-orange); letter-spacing: -2px;">0</div>
                 </div>
             </div>
 

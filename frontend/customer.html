@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+    <div class="mesh-bg"></div>
     <div id="app" class="app-container">
         <!-- Decorative Floating Food Icons -->
         <div class="floating-food-container">
@@ -101,17 +102,17 @@
                     <p>Snag fresh goods from local vendors around you.</p>
                 </div>
                 
-                <div class="product-grid" id="customer-product-list">
+                <div class="product-grid stagger-in" id="customer-product-list">
                     <!-- Products rendered via JS -->
                 </div>
 
                 <!-- NEW: My Orders / Cart Section -->
-                <div id="customer-orders-section" style="margin-top: 4rem;">
-                    <div class="view-header" style="margin-bottom: 1.5rem; border-left: 4px solid var(--accent-blue); padding-left: 1rem;">
-                        <h2 style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="shopping-cart"></i> My Orders</h2>
+                <div id="customer-orders-section" class="stagger-in" style="margin-top: 4rem;">
+                    <div class="view-header" style="margin-bottom: 2rem; border-left: 5px solid var(--accent-blue); padding-left: 1.5rem;">
+                        <h2 style="display: flex; align-items: center; gap: 0.75rem; font-size: 2rem;"><i data-lucide="shopping-cart"></i> My Orders</h2>
                         <p>Track your pickups and view your unique OTP codes here.</p>
                     </div>
-                    <div id="customer-orders-list" class="orders-history-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <div id="customer-orders-list" class="orders-history-grid stagger-in" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
                         <!-- Orders populated via JS -->
                     </div>
                 </div>

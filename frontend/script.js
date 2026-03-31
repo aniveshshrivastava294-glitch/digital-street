@@ -124,6 +124,20 @@ window.initApp = async function() {
 // Auto-init for modules
 initApp();
 
+// Premium Mouse Parallax Effect
+document.addEventListener('mousemove', (e) => {
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+    
+    const moveX = (x - 0.5) * 40;
+    const moveY = (y - 0.5) * 40;
+    
+    const bg = document.querySelector('.mesh-bg');
+    if (bg) {
+        bg.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.1)`;
+    }
+});
+
 /* ================= PROFILE LOGIC ================= */
 window.openProfileModal = function() {
     if(!currentUser) return;
@@ -259,9 +273,10 @@ function renderCustomerView() {
         list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 3rem; color:var(--text-secondary);">No products found.</div>`;
     }
 
-    filteredItems.forEach(item => {
+    filteredItems.forEach((item, index) => {
         const card = document.createElement("div");
         card.className = "product-card glass-panel";
+        card.style.animationDelay = `${index * 0.05}s`;
         
         // Find vendor status from vendorsArray
         const vendor = vendorsArray.find(v => v.email === item.vendorEmail);
@@ -325,7 +340,7 @@ function renderCustomerView() {
         if (myOrders.length === 0) {
             ordersList.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 2.5rem; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; color:var(--text-secondary); background: rgba(255,255,255,0.02);">You haven't placed any orders yet.</div>`;
         } else {
-            ordersList.innerHTML = myOrders.slice().reverse().map(order => {
+            ordersList.innerHTML = myOrders.slice().reverse().map((order, index) => {
                 let statusColor = "var(--text-secondary)";
                 if (order.status === 'COMPLETED') statusColor = "var(--accent-green)";
                 if (order.status === 'CANCELLED') statusColor = "var(--accent-red)";
@@ -343,7 +358,7 @@ function renderCustomerView() {
                     : "";
 
                 return `
-                <div class="glass-panel" style="padding: 1.5rem; display:flex; flex-direction:column; justify-content:space-between; border-color: ${isPending ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'}; transition: transform 0.3s ease;">
+                <div class="glass-panel" style="padding: 1.5rem; display:flex; flex-direction:column; justify-content:space-between; border-color: ${isPending ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'}; transition: transform 0.3s ease; animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: ${index * 0.05}s;">
                     <div>
                         <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 0.5rem;">
                             <h4 style="margin:0; font-size:1.1rem; font-weight:700;">${order.title}</h4>
@@ -431,9 +446,10 @@ function renderVendorView() {
     const myItems = storeItems.filter(i => i.vendorEmail === currentUser?.email);
     if(myItems.length === 0) list.innerHTML = "<div style='text-align:center; padding: 2rem; color:var(--text-secondary);'>None listed yet.</div>";
 
-    myItems.forEach(item => {
+    myItems.forEach((item, index) => {
         const card = document.createElement("div");
         card.className = "vendor-item-card glass-panel";
+        card.style.animation = `fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both ${index * 0.05}s`;
         const isStocked = item.status === 'IN_STOCK';
         let toggleText = isStocked ? "Set Sold Out" : "Set In Stock";
 

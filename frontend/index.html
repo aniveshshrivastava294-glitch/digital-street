@@ -55,6 +55,7 @@
     </style>
 </head>
 <body class="login-body">
+    <div class="mesh-bg"></div>
     <!-- Decorative Floating Food Icons -->
     <div class="floating-food-container">
         <i data-lucide="apple" class="floating-food f-1" style="width: 80px; height: 80px;"></i>
@@ -75,32 +76,44 @@
     </div>
 
     <div class="login-main-wrapper">
-        <!-- New Mission Info Section -->
-        <div class="login-info-section">
-            <h2>The Heart of Your Neighborhood</h2>
-            <p>Digital Street is a movement aimed at revitalizing our local community. We bridge the gap between neighborhood artisans, passionate farmers, and conscious consumers like you. Every purchase directly empowers local families and keeps the unique spirit of our neighborhood alive.</p>
-            
-            <div class="trust-badge-row">
-                <div class="trust-badge-item">
-                    <i data-lucide="shopping-bag"></i>
-                    <span>Fresh Daily</span>
+        <!-- New Mission Info Section with 3D Image Overlay -->
+        <div class="login-info-section stagger-in" style="background-image: linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.4)), url('./neighborhood_market_hero_1774955384720.png'); background-size: cover; background-position: center; border-radius: 40px; padding: 4rem; overflow: hidden; position: relative;">
+            <div style="position: relative; z-index: 2;">
+                <span style="text-transform: uppercase; letter-spacing: 3px; font-weight: 800; color: var(--accent-orange); font-size: 0.75rem; margin-bottom: 1rem; display: block;">Our Mission</span>
+                <h2 style="color: white; font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem; text-shadow: 0 10px 30px rgba(0,0,0,0.5);">The Heart of Your <br>Neighborhood</h2>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; max-width: 500px; line-height: 1.6; margin-bottom: 2.5rem;">Digital Street is a movement aimed at revitalizing our local community. We bridge the gap between neighborhood artisans, passionate farmers, and conscious consumers like you.</p>
+                
+                <div class="trust-badge-row">
+                    <div class="trust-badge-item glass-panel" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
+                        <i data-lucide="shopping-bag" style="color: var(--accent-orange);"></i>
+                        <span style="color: white;">Fresh Daily</span>
+                    </div>
+                    <div class="trust-badge-item glass-panel" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
+                        <i data-lucide="shield-check" style="color: var(--accent-green);"></i>
+                        <span style="color: white;">Verified</span>
+                    </div>
+                    <div class="trust-badge-item glass-panel" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
+                        <i data-lucide="users" style="color: var(--accent-blue);"></i>
+                        <span style="color: white;">Community</span>
+                    </div>
                 </div>
-                <div class="trust-badge-item">
-                    <i data-lucide="shield-check"></i>
-                    <span>Verified</span>
-                </div>
-                <div class="trust-badge-item">
-                    <i data-lucide="users"></i>
-                    <span>Community</span>
+
+                <!-- Community impact visual -->
+                <div class="glass-panel" style="margin-top: 3rem; padding: 1.5rem; display: flex; gap: 1.5rem; align-items: center; background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); max-width: 450px;">
+                    <img src="./fresh_produce_handshake_1774955418133.png" style="width: 100px; height: 100px; border-radius: 20px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                    <div>
+                        <h4 style="color: white; font-weight: 700;">100% Direct Impact</h4>
+                        <p style="color: rgba(255,255,255,0.7); font-size: 0.8rem;">Every purchase goes directly into the pockets of local neighborhood sellers.</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="login-container glass-panel" style="max-width: 450px;">
+        <div class="login-container glass-panel stagger-in" style="max-width: 450px;">
         <div class="login-header">
             <i data-lucide="store" class="logo-icon-large"></i>
             <h1>Digital Street</h1>
-            <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Connecting your neighborhood with fresh goods.</p>
+            <p style="margin-bottom: 2rem; color: var(--text-secondary); font-size: 0.9rem;">Connecting your neighborhood with fresh goods.</p>
         </div>
         
         <div class="auth-tabs">
