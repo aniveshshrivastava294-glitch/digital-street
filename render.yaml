@@ -1,0 +1,17 @@
+# render.yaml
+services:
+  - type: web
+    name: digital-street
+    env: node
+    plan: free # Change this to 'standard' if you need more resources
+    buildCommand: npm install && npm run install-backend
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PORT
+        value: 10000 # Render's default HTTP port
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1 # Ensuring local persistence for database.json if needed
