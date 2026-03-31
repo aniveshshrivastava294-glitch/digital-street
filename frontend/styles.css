@@ -33,8 +33,6 @@
 body {
   background-color: var(--bg-color);
   color: var(--text-primary);
-  display: flex;
-  justify-content: center;
   min-height: 100vh;
   /* Soft warm gradient mesh */
   background: radial-gradient(circle at top left, #f5ede3 0%, #ede0d4 100%);
@@ -42,25 +40,25 @@ body {
 
 #app {
   width: 100%;
-  max-width: 600px;
+  max-width: 1400px;
   min-height: 100vh;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Header */
 .app-header {
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 3rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background: #1a1a1a; /* Dark top section */
+  background: #1a1a1a; 
   color: white;
-  z-index: 10;
+  z-index: 100;
   position: relative;
-  /* Wavy SVG divider at bottom */
   margin-bottom: 2rem;
 }
 
@@ -164,6 +162,21 @@ main {
   box-shadow: var(--glass-shadow);
   overflow: hidden;
   transition: var(--transition-fast);
+}
+
+/* Grids for multi-column website layout */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  width: 100%;
+}
+
+.vendor-products-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .product-card {
