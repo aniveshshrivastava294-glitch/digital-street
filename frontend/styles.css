@@ -589,6 +589,88 @@ main {
   font-size: 0.9rem;
 }
 
+/* Two-column Login Layout */
+.login-main-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  z-index: 10;
+}
+
+.login-info-section {
+  flex: 1;
+  color: var(--text-primary);
+  max-width: 500px;
+  text-align: left;
+}
+
+.login-info-section h2 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.login-info-section p {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+}
+
+.trust-badge-row {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.trust-badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.trust-badge-item i {
+  color: var(--accent-orange);
+  width: 32px;
+  height: 32px;
+}
+
+.trust-badge-item span {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+  .login-main-wrapper {
+    flex-direction: column;
+    gap: 3rem;
+    text-align: center;
+    padding-top: 4rem;
+  }
+  .login-info-section {
+    order: -1;
+    text-align: center;
+  }
+  .login-info-section h2 {
+    font-size: 2.5rem;
+  }
+  .trust-badge-row {
+    justify-content: center;
+  }
+}
+
 /* Modals */
 .modal-overlay {
   position: fixed;
