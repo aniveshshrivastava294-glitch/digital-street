@@ -19,13 +19,25 @@ let searchQuery = "";
 let cameraStream = null;
 let supportTicketsArray = []; // New state for dedicated collection
 
+// 🔄 Immediate Session Restore (Local-First)
+(function preLoadSession() {
+    const session = localStorage.getItem('digitalStreetSession');
+    if (session) {
+        try {
+            currentUser = JSON.parse(session);
+        } catch (e) {
+            console.warn("Session restore failed", e);
+        }
+    }
+})();
+
 // 🚀 Real-time Firestore Listeners
 function initFirebaseListeners() {
     // 1. Listen to Store Items
     onSnapshot(collection(db, "storeItems"), (snapshot) => {
         storeItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         reRenderActive();
-    });
+    }, (err) => console.error("Store Items Listener Error:", err));
 
     // 2. Listen to Platform Metrics
     onSnapshot(doc(db, "config", "platformMetrics"), (snapshot) => {
@@ -33,16 +45,16 @@ function initFirebaseListeners() {
             platformMetrics = snapshot.data();
             reRenderActive();
         } else {
-            // Initialize if missing
-            setDoc(doc(db, "config", "platformMetrics"), { totalIncome: 0, salesHistory: [], supportTickets: [] });
+            console.warn("config/platformMetrics document not found.");
+            // Don't crash—just keep defaults
         }
-    });
+    }, (err) => console.error("Metrics Listener Error:", err));
 
     // 3. Listen to Orders (for Admin & User views)
     onSnapshot(collection(db, "orders"), (snapshot) => {
         ordersArray = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         reRenderActive();
-    });
+    }, (err) => console.error("Orders Listener Error:", err));
 
     // 4. Listen to Users (for Admin View)
     onSnapshot(collection(db, "users"), (snapshot) => {
@@ -54,20 +66,20 @@ function initFirebaseListeners() {
         if (currentUser) {
             const fresh = allUsers.find(u => u.email === currentUser.email);
             if (fresh) {
-                currentUser = fresh;
+                currentUser = { ...fresh };
                 localStorage.setItem('digitalStreetSession', JSON.stringify(currentUser));
                 updateHeaderUI();
             }
         }
         reRenderActive();
-    });
+    }, (err) => console.error("Users Listener Error:", err));
     
     // 5. Listen to Support Tickets (Dedicated Collection)
     const ticketsQuery = query(collection(db, "supportTickets"), orderBy("timestamp", "desc"));
     onSnapshot(ticketsQuery, (snapshot) => {
         supportTicketsArray = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         reRenderActive();
-    });
+    }, (err) => console.error("Support Tickets Listener Error:", err));
 }
 
 function updateHeaderUI() {
@@ -81,34 +93,41 @@ function updateHeaderUI() {
 
 // 🔐 Auth Observer
 onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.email));
-        if (userDoc.exists()) {
-            currentUser = { ...userDoc.data(), email: user.email };
-            localStorage.setItem('digitalStreetSession', JSON.stringify(currentUser));
-            updateHeaderUI();
-            reRenderActive();
-        }
-    } else {
-        // Check if this is an admin session (admin has no Firebase account)
-        const session = localStorage.getItem('digitalStreetSession');
-        const isAdminAuth = localStorage.getItem('adminAuthenticated') === 'true';
-        
-        if (session && isAdminAuth) {
-            // Admin session — load from localStorage and allow access
-            currentUser = JSON.parse(session);
-            updateHeaderUI();
-            reRenderActive();
-            return;
-        }
+    // 🛡️ Enhanced Redirect Reliability
+    const isPublic = !window.APP_MODE || window.APP_MODE === 'WELCOME';
+    const hasSession = localStorage.getItem('digitalStreetSession') !== null;
+    const isAdminAuth = localStorage.getItem('adminAuthenticated') === 'true';
 
+    if (user) {
+        try {
+            const userDoc = await getDoc(doc(db, "users", user.email));
+            if (userDoc.exists()) {
+                currentUser = { ...userDoc.data(), email: user.email };
+                localStorage.setItem('digitalStreetSession', JSON.stringify(currentUser));
+                updateHeaderUI();
+                reRenderActive();
+            }
+        } catch (e) {
+            console.warn("Auth sync error – staying with local session", e);
+            updateHeaderUI();
+            reRenderActive();
+        }
+    } else if (hasSession && isAdminAuth) {
+        // Handle Admin persistence across refreshes
+        currentUser = JSON.parse(localStorage.getItem('digitalStreetSession'));
+        updateHeaderUI();
+        reRenderActive();
+    } else {
+        // No user and no local session
         currentUser = null;
         localStorage.removeItem('digitalStreetSession');
-        const isPublicPage = window.location.pathname.includes('index.html') || 
-                             window.location.pathname.includes('admin_login.html') ||
-                             window.location.pathname === '/' ||
-                             window.location.pathname.endsWith('/');
-        if (!isPublicPage) window.location.href = 'index.html';
+        
+        // Only redirect if we are on a functional page (Customer/Vendor/Admin)
+        // and clearly not Authenticated.
+        if (!isPublic) {
+            console.warn("Unauthorized access – Redirecting to Home.");
+            window.location.href = 'index.html';
+        }
     }
 });
 
@@ -116,6 +135,16 @@ const formatCurrency = (amt) => "₹" + (amt || 0).toFixed(2);
 const generateHoldCode = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 window.initApp = async function() {
+    // 1. Resolve header and visibility immediately based on APP_MODE
+    updateHeaderUI();
+    reRenderActive();
+    
+    // 2. Ensure the mission section (if any) starts hidden if not on index
+    if (window.APP_MODE && window.APP_MODE !== 'WELCOME') {
+        const mission = document.querySelector('.login-info-section');
+        if (mission) mission.style.display = 'none';
+    }
+
     lucide.createIcons();
     initFirebaseListeners();
     initGSAP();
@@ -167,6 +196,15 @@ function initGSAP() {
             clearProps: "all"
         });
     });
+
+    // Safety Fallback: If animations haven't fired after 2.5 seconds, force-reveal everything.
+    setTimeout(() => {
+        const hidden = document.querySelectorAll(".reveal > *:not(.animated)");
+        if (hidden.length > 0) {
+            console.warn("GSAP safety fallback triggered for", hidden.length, "elements.");
+            gsap.to(hidden, { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, clearProps: "all" });
+        }
+    }, 2500);
 }
 
 function animateTransitions() {
