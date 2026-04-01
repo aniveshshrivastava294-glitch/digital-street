@@ -24,10 +24,7 @@
 /* JavaScript GSAP Animations handle reveal and stagger (Handled in script.js) */
 
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(40px) scale(0.95); filter: blur(10px); }
-  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-}
+/* Removed fadeInUp animation */
 
 @keyframes floatBreath {
   0%, 100% { transform: translateY(0) rotate(0deg) translateZ(0); }
@@ -40,19 +37,9 @@
   100% { background-position: 200% 0; }
 }
 
-.stagger-in > * { opacity: 0; animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-fill-mode: both; }
-.stagger-in > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger-in > *:nth-child(2) { animation-delay: 0.1s; }
-.stagger-in > *:nth-child(3) { animation-delay: 0.15s; }
-.stagger-in > *:nth-child(4) { animation-delay: 0.2s; }
-.stagger-in > *:nth-child(5) { animation-delay: 0.25s; }
-.stagger-in > *:nth-child(6) { animation-delay: 0.3s; }
-.stagger-in > *:nth-child(7) { animation-delay: 0.35s; }
-.stagger-in > *:nth-child(8) { animation-delay: 0.4s; }
-.stagger-in > *:nth-child(9) { animation-delay: 0.45s; }
-.stagger-in > *:nth-child(10) { animation-delay: 0.5s; }
-/* Fallback: anything beyond nth-child(10) should still be visible */
-.stagger-in > *:nth-child(n+11) { opacity: 1; animation: none; }
+/* Stagger-in: no entrance animation, always visible */
+.stagger-in > * { opacity: 1; }
+
 
 /* Base Reset */
 * {
@@ -182,7 +169,6 @@ main {
 
 .view-section {
   display: none;
-  animation: fadeIn 0.4s ease forwards;
 }
 .view-section.active {
   display: flex;
@@ -200,10 +186,7 @@ main {
   font-size: 0.95rem;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* Removed fadeIn animation */
 
 .view-section {
   will-change: opacity, transform;
@@ -387,7 +370,6 @@ main {
   border-radius: var(--btn-radius);
   text-align: center;
   border: 1px dashed var(--accent-blue);
-  animation: fadeIn 0.3s ease;
 }
 .code-reveal h4 {
   font-size: 0.85rem;
@@ -541,15 +523,11 @@ main {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   backdrop-filter: blur(10px);
 }
 .toast-icon { width: 20px; height: 20px; color: var(--accent-green); }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* Removed slideUp animation */
 
 .toast-fade-out {
   animation: fadeOut 0.3s ease forwards;
@@ -592,7 +570,6 @@ main {
   flex-direction: column;
   gap: 2rem;
   width: 100%;
-  animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 .login-header {
   text-align: center;
@@ -763,7 +740,6 @@ main {
   width: 90%;
   max-width: 400px;
   padding: 2rem;
-  animation: slideUp 0.3s ease;
 }
 .modal-input {
   width: 100%;

@@ -148,156 +148,22 @@ window.initApp = async function() {
 
         if (typeof lucide !== 'undefined') lucide.createIcons();
         initFirebaseListeners();
-        initGSAP();
         setInterval(tickTimers, 1000);
         
-        // 🚀 Final Force-Show Reveal Fallback (Global)
-        setTimeout(() => {
-            document.querySelectorAll('.reveal > *, .view-section').forEach(el => {
-                if(getComputedStyle(el).opacity === '0' || el.style.opacity === '0') {
-                    gsap.to(el, { opacity: 1, y: 0, duration: 0.5 });
-                }
-            });
-        }, 3000);
-        
+        // Fallback or explicit shows no longer needed as CSS handles default visibility 
     } catch (err) {
         console.error("Critical App Init Failure:", err);
-        // Emergency show-all if something fails
-        document.body.style.opacity = '1';
-        document.querySelectorAll('.reveal > *').forEach(e => e.style.opacity = '1');
     }
 };
 
-// 🎨 GSAP Animation Engine
-function initGSAP() {
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-        console.warn('GSAP or ScrollTrigger not found, falling back to static view.');
-        document.querySelectorAll('.reveal > *').forEach(e => e.style.opacity = '1');
-        return;
-    }
-    
-    gsap.registerPlugin(ScrollTrigger);
-    
-    // Page Entrance
-    gsap.from(".app-header", {
-        y: -100,
-        opacity: 0,
-        duration: 1.2,
-        ease: "expo.out",
-        clearProps: "all"
-    });
+// Animations removed for stable visibility
 
-    // Global Scroll Reveals (Staggered Children)
-    const revealSections = document.querySelectorAll(".reveal");
-    revealSections.forEach(section => {
-        section.classList.add('ready');
-        const children = section.children;
-        
-        // MANUALLY SET HIDDEN STATE ONLY IF RUNNING GSAP
-        gsap.set(children, { opacity: 0, y: 20 });
-
-        // If the section is already visible, reveal immediately
-        if (section.offsetParent !== null && section.getBoundingClientRect().top < window.innerHeight) {
-            gsap.to(children, {
-                opacity: 1, y: 0, duration: 1.5, stagger: 0.1, ease: "power4.out", clearProps: "all"
-            });
-        }
-
-        gsap.to(children, {
-            scrollTrigger: {
-                trigger: section,
-                start: "top 90%",
-                toggleActions: "play none none none"
-            },
-            y: 0,
-            opacity: 1,
-            duration: 1.2,
-            stagger: 0.15,
-            ease: "power4.out",
-            clearProps: "all"
-        });
-    });
-
-    // Safety Fallback: Force-reveal everything if animations are stuck.
-    setTimeout(() => {
-        document.querySelectorAll(".reveal > *:not(.animated)").forEach(item => {
-            if (gsap.getProperty(item, "opacity") < 0.1) {
-                gsap.to(item, { opacity: 1, y: 0, duration: 0.5, clearProps: "all" });
-            }
-        });
-    }, 2000);
-}
-
-function animateTransitions() {
-    if (typeof gsap === 'undefined') return;
-    
-    // Premium staggered entry for dynamic lists
-    const containers = document.querySelectorAll('.product-grid, .orders-history-grid, .vendor-products-list, #admin-customers-table, #admin-vendors-table');
-    containers.forEach(container => {
-        const items = container.querySelectorAll('.glass-panel:not(.animated), tr:not(.animated)');
-        if (items.length > 0) {
-            gsap.fromTo(items, 
-                { opacity: 0, y: 20 }, 
-                { 
-                    opacity: 1, y: 0,
-                    duration: 0.8, stagger: 0.1, 
-                    ease: "power3.out",
-                    onScrollTrigger: { trigger: container, start: "top 90%" },
-                    onComplete: () => {
-                        items.forEach(i => i.classList.add('animated'));
-                    }
-                }
-            );
-        }
-    });
-
-    // Refresh ScrollTrigger to account for new content
-    if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.refresh();
-        
-        // Also check if any revealed sections were just swapped in
-        document.querySelectorAll('.reveal.ready').forEach(section => {
-            if (section.offsetParent !== null) { // Visible
-                const invisibleChildren = Array.from(section.children).filter(c => gsap.getProperty(c, "opacity") === 0);
-                if (invisibleChildren.length > 0) {
-                    gsap.to(invisibleChildren, {
-                        opacity: 1, y: 0, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "all"
-                    });
-                }
-            }
-        });
-    }
-}
 
 // Auto-init for modules
 initApp();
 
-// Premium Mouse Parallax Effect (Robust Version)
-document.addEventListener('mousemove', (e) => {
-    if (typeof gsap === 'undefined') return;
-    
-    const x = (e.clientX / window.innerWidth) - 0.5;
-    const y = (e.clientY / window.innerHeight) - 0.5;
-    
-    gsap.to('.mesh-bg', {
-        x: x * 80,
-        y: y * 80,
-        duration: 2.5,
-        ease: "power2.out"
-    });
+// Premium Mouse Parallax Effect disabled to prevent visibility conflicts
 
-    // Stronger tilt and movement for the floating food container
-    // This creates the "3D depth" feeling without breaking CSS animations
-    gsap.to('.floating-food-container', {
-        x: x * 60,
-        y: y * 60,
-        rotateX: y * -15, // Tilting the perspective
-        rotateY: x * 15,
-        duration: 3,
-        ease: "power1.out",
-        overwrite: "auto"
-    });
-});
 
 /* ================= PROFILE LOGIC ================= */
 window.openProfileModal = function() {
@@ -453,7 +319,7 @@ function renderCustomerView() {
     filteredItems.forEach((item, index) => {
         const card = document.createElement("div");
         card.className = "product-card glass-panel";
-        card.style.animationDelay = `${index * 0.05}s`;
+        card.className = "product-card glass-panel";
         
         // Find vendor status from vendorsArray
         const vendor = vendorsArray.find(v => v.email === item.vendorEmail);
@@ -535,7 +401,7 @@ function renderCustomerView() {
                     : "";
 
                 return `
-                <div class="glass-panel" style="padding: 1.5rem; display:flex; flex-direction:column; justify-content:space-between; border-color: ${isPending ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'}; transition: transform 0.3s ease; animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: ${index * 0.05}s;">
+                <div class="glass-panel" style="padding: 1.5rem; display:flex; flex-direction:column; justify-content:space-between; border-color: ${isPending ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'}; transition: transform 0.3s ease;">
                     <div>
                         <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 0.5rem;">
                             <h4 style="margin:0; font-size:1.1rem; font-weight:700;">${order.title}</h4>
@@ -628,7 +494,6 @@ function renderVendorView() {
     myItems.forEach((item, index) => {
         const card = document.createElement("div");
         card.className = "vendor-item-card glass-panel";
-        card.style.animation = `fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both ${index * 0.05}s`;
         const isStocked = item.status === 'IN_STOCK';
         let toggleText = isStocked ? "Set Sold Out" : "Set In Stock";
 
@@ -989,9 +854,6 @@ function reRenderActive() {
     if(window.APP_MODE === 'CUSTOMER') renderCustomerView();
     if(window.APP_MODE === 'VENDOR') renderVendorView();
     if(window.APP_MODE === 'ADMIN') renderAdminView();
-    
-    // Trigger animations after DOM updates
-    setTimeout(animateTransitions, 50);
 }
 
 function tickTimers() {
