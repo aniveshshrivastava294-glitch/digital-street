@@ -118,24 +118,125 @@ const generateHoldCode = () => Math.floor(1000 + Math.random() * 9000).toString(
 window.initApp = async function() {
     lucide.createIcons();
     initFirebaseListeners();
+    initGSAP();
     setInterval(tickTimers, 1000);
 };
+
+// 🎨 GSAP Animation Engine
+function initGSAP() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+        console.warn('GSAP or ScrollTrigger not found, falling back to static view.');
+        return;
+    }
+    
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Page Entrance
+    gsap.from(".app-header", {
+        y: -100,
+        opacity: 0,
+        duration: 1.2,
+        ease: "expo.out"
+    });
+
+    // Global Scroll Reveals (Staggered Children)
+    const revealSections = document.querySelectorAll(".reveal");
+    revealSections.forEach(section => {
+        section.classList.add('ready');
+        const children = section.children;
+        
+        // If the section is already visible (like on a dashboard/direct page load), 
+        // reveal immediately. Otherwise, use ScrollTrigger.
+        if (section.offsetParent !== null && section.getBoundingClientRect().top < window.innerHeight) {
+            gsap.to(children, {
+                opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power4.out", clearProps: "all"
+            });
+        }
+
+        gsap.to(children, {
+            scrollTrigger: {
+                trigger: section,
+                start: "top 90%",
+                toggleActions: "play none none none"
+            },
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.15,
+            ease: "power4.out",
+            clearProps: "all"
+        });
+    });
+}
+
+function animateTransitions() {
+    if (typeof gsap === 'undefined') return;
+    
+    // Premium staggered entry for dynamic lists
+    const containers = document.querySelectorAll('.product-grid, .orders-history-grid, .vendor-products-list, #admin-customers-table, #admin-vendors-table');
+    containers.forEach(container => {
+        const items = container.querySelectorAll('.glass-panel:not(.animated), tr:not(.animated)');
+        if (items.length > 0) {
+            gsap.fromTo(items, 
+                { opacity: 0, y: 20 }, 
+                { 
+                    opacity: 1, y: 0,
+                    duration: 0.8, stagger: 0.1, 
+                    ease: "power3.out",
+                    onComplete: () => {
+                        items.forEach(i => i.classList.add('animated'));
+                    }
+                }
+            );
+        }
+    });
+
+    // Refresh ScrollTrigger to account for new content
+    if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.refresh();
+        
+        // Also check if any revealed sections were just swapped in
+        document.querySelectorAll('.reveal.ready').forEach(section => {
+            if (section.offsetParent !== null) { // Visible
+                const invisibleChildren = Array.from(section.children).filter(c => gsap.getProperty(c, "opacity") === 0);
+                if (invisibleChildren.length > 0) {
+                    gsap.to(invisibleChildren, {
+                        opacity: 1, y: 0, duration: 0.8, stagger: 0.05, ease: "power2.out", clearProps: "all"
+                    });
+                }
+            }
+        });
+    }
+}
 
 // Auto-init for modules
 initApp();
 
-// Premium Mouse Parallax Effect
+// Premium Mouse Parallax Effect (Robust Version)
 document.addEventListener('mousemove', (e) => {
-    const x = e.clientX / window.innerWidth;
-    const y = e.clientY / window.innerHeight;
+    if (typeof gsap === 'undefined') return;
     
-    const moveX = (x - 0.5) * 40;
-    const moveY = (y - 0.5) * 40;
+    const x = (e.clientX / window.innerWidth) - 0.5;
+    const y = (e.clientY / window.innerHeight) - 0.5;
     
-    const bg = document.querySelector('.mesh-bg');
-    if (bg) {
-        bg.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.1)`;
-    }
+    gsap.to('.mesh-bg', {
+        x: x * 80,
+        y: y * 80,
+        duration: 2.5,
+        ease: "power2.out"
+    });
+
+    // Stronger tilt and movement for the floating food container
+    // This creates the "3D depth" feeling without breaking CSS animations
+    gsap.to('.floating-food-container', {
+        x: x * 60,
+        y: y * 60,
+        rotateX: y * -15, // Tilting the perspective
+        rotateY: x * 15,
+        duration: 3,
+        ease: "power1.out",
+        overwrite: "auto"
+    });
 });
 
 /* ================= PROFILE LOGIC ================= */
@@ -807,6 +908,9 @@ function reRenderActive() {
     if(window.APP_MODE === 'CUSTOMER') renderCustomerView();
     if(window.APP_MODE === 'VENDOR') renderVendorView();
     if(window.APP_MODE === 'ADMIN') renderAdminView();
+    
+    // Trigger animations after DOM updates
+    setTimeout(animateTransitions, 50);
 }
 
 function tickTimers() {

@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <style>
         .auth-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; }
         .auth-tab { cursor: pointer; padding: 0.75rem 1.5rem; border-radius: 50px; color: var(--text-secondary); font-weight: 700; transition: all 0.3s; background: rgba(0,0,0,0.03); }
@@ -77,7 +79,7 @@
 
     <div class="login-main-wrapper">
         <!-- New Mission Info Section with 3D Image Overlay -->
-        <div class="login-info-section stagger-in" style="background-image: linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.4)), url('./neighborhood_market_hero_1774955384720.png'); background-size: cover; background-position: center; border-radius: 40px; padding: 4rem; overflow: hidden; position: relative;">
+        <div class="login-info-section reveal" style="background-image: linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.4)), url('./neighborhood_market_hero_1774955384720.png'); background-size: cover; background-position: center; border-radius: 40px; padding: 4rem; overflow: hidden; position: relative;">
             <div style="position: relative; z-index: 2;">
                 <span style="text-transform: uppercase; letter-spacing: 3px; font-weight: 800; color: var(--accent-orange); font-size: 0.75rem; margin-bottom: 1rem; display: block;">Our Mission</span>
                 <h2 style="color: white; font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem; text-shadow: 0 10px 30px rgba(0,0,0,0.5);">The Heart of Your <br>Neighborhood</h2>
@@ -109,7 +111,7 @@
             </div>
         </div>
 
-        <div class="login-container glass-panel stagger-in" style="max-width: 450px;">
+        <div class="login-container glass-panel reveal" style="max-width: 450px;">
         <div class="login-header">
             <i data-lucide="store" class="logo-icon-large"></i>
             <h1>Digital Street</h1>

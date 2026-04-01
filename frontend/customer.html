@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
 <body>
     <div class="mesh-bg"></div>
@@ -53,7 +55,7 @@
         </header>
 
         <!-- Hero Section -->
-        <div class="hero-section" style="margin-top: 4rem; padding: 0 2rem; margin-bottom: 3rem;">
+        <div class="hero-section reveal" style="margin-top: 4rem; padding: 0 2rem; margin-bottom: 3rem;">
             <div class="glass-panel" style="position: relative; height: 350px; display: flex; align-items: center; padding: 3rem; background: linear-gradient(135deg, #1a1a1a 0%, #2d241e 100%); border: none; border-radius: var(--panel-radius);">
                 <div style="position: absolute; inset: 0; background: radial-gradient(circle at bottom right, rgba(192, 140, 93, 0.2) 0%, transparent 70%); border-radius: var(--panel-radius);"></div>
                 <div style="position: relative; z-index: 1; max-width: 400px; color: white;">
@@ -71,7 +73,7 @@
             <section id="customer-view" class="view-section active">
                 
                 <!-- NEW: Customer E-Wallet Card -->
-                <div class="glass-panel wallet-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.15)); border: 1px solid rgba(59, 130, 246, 0.3); margin-bottom: 2rem;">
+                <div class="glass-panel wallet-card reveal" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.15)); border: 1px solid rgba(59, 130, 246, 0.3); margin-bottom: 2rem;">
                     <div>
                         <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;"><i data-lucide="wallet" style="width:14px; height:14px;"></i> Digital Wallet</div>
                         <div id="customer-wallet-balance" style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary);">₹0.00</div>
@@ -82,7 +84,7 @@
                 </div>
 
                 <!-- NEW: Search Bar -->
-                <div class="search-container glass-panel" style="margin-bottom: 2rem;">
+                <div class="search-container glass-panel reveal" style="margin-bottom: 2rem;">
                     <i data-lucide="search" class="search-icon"></i>
                     <input type="text" id="search-input" placeholder="Search for fresh goods..." oninput="handleSearch(this.value)">
                 </div>
