@@ -15,6 +15,16 @@ const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
 // Serve static frontend files
 app.use(express.static(FRONTEND_DIR));
 
+// 🔄 Friendly Routing (Handle clean URLs for static pages)
+app.get('/customer', (req, res) => res.sendFile(path.join(FRONTEND_DIR, 'customer.html')));
+app.get('/vendor', (req, res) => res.sendFile(path.join(FRONTEND_DIR, 'vendor.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(FRONTEND_DIR, 'admin.html')));
+app.get('/admin_login', (req, res) => res.sendFile(path.join(FRONTEND_DIR, 'admin_login.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(FRONTEND_DIR, 'index.html')));
+
+// Catch-all: Redirect undefined routes to the welcome page
+app.get('*', (req, res) => res.sendFile(path.join(FRONTEND_DIR, 'index.html')));
+
 // 🩺 Health Check
 app.get('/api/ping', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 

@@ -41,10 +41,10 @@
             <section id="vendor-view" class="view-section active stagger-in">
                 
                 <!-- Vendor Sales Analytics -->
-                <div class="glass-panel reveal" style="padding: 2.5rem; display: flex; justify-content: space-between; align-items: center; background: #fffcf9; border: 1px solid var(--panel-border); margin-top: 2rem; margin-bottom: 3rem;">
+                <div class="glass-panel reveal" style="padding: 2.5rem; display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid var(--panel-border); margin-top: 2rem; margin-bottom: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
                     <div>
                         <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="trending-up" style="width:16px; height:16px; color: var(--accent-orange);"></i> Total Store Revenue</div>
-                        <div id="vendor-daily-sales" style="font-size: 3.5rem; font-weight: 800; color: var(--text-primary);">₹0.00</div>
+                        <div id="vendor-daily-sales" style="font-size: 3.5rem; font-weight: 800; color: #1a1614;">₹0.00</div>
                     </div>
                 </div>
 
@@ -102,13 +102,13 @@
                 <button onclick="closeAddModal()" style="background:none; border:none; color:white; cursor:pointer;"><i data-lucide="x"></i></button>
             </div>
             <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <input type="text" id="new-item-name" placeholder="Item Name (e.g. Fresh Cookies)" class="modal-input" />
-                <input type="number" id="new-item-price" placeholder="Price (e.g. 5.50)" step="0.01" class="auth-input" />
+                <input type="text" id="new-item-name" placeholder="Item Name (e.g. Fresh Cookies)" class="modal-input" style="color: #000; font-weight: 600;" />
+                <input type="number" id="new-item-price" placeholder="Price (e.g. 5.50)" step="0.01" class="auth-input" style="color: #000; font-weight: 600;" />
                 
-                <div class="input-group">
+                <div class="input-group" style="display: flex; flex-direction: column; gap: 0.25rem;">
                     <label style="color:var(--text-secondary); font-size:0.8rem;">Product Visual</label>
                     <div style="display: flex; gap: 0.5rem;">
-                        <input type="text" id="new-item-visual" placeholder="Icon (cake, apple) or Image URL" class="modal-input" style="flex:1;" />
+                        <input type="text" id="new-item-visual" placeholder="Icon (cake, apple) or Image URL" class="modal-input" style="flex:1; color: #000; font-weight: 600;" />
                         <button class="primary-btn" style="background: var(--accent-purple); padding: 0.5rem 1rem;" onclick="startCamera()">
                             <i data-lucide="camera"></i>
                         </button>

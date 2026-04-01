@@ -21,8 +21,8 @@
   --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-spring: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+/* JavaScript GSAP Animations handle reveal and stagger (Handled in script.js) */
 
-.reveal.ready > * { opacity: 0; } /* Only hide once JS is ready to animate them */
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(40px) scale(0.95); filter: blur(10px); }
@@ -759,13 +759,18 @@ main {
   padding: 1rem;
   border-radius: 8px;
   border: 1px solid var(--panel-border);
-  background: rgba(0,0,0,0.5);
-  color: white;
+  background: #ffffff;
+  color: #1a1614;
   font-size: 1rem;
   outline: none;
+  font-weight: 500;
+}
+.modal-input::placeholder {
+  color: #a39e9a;
 }
 .modal-input:focus {
-  border-color: var(--accent-blue);
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
 }
 
 .input-group {

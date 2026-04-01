@@ -109,22 +109,22 @@ onAuthStateChanged(auth, async (user) => {
             }
         } catch (e) {
             console.warn("Auth sync error – staying with local session", e);
-            updateHeaderUI();
-            reRenderActive();
+            if(hasSession) {
+                currentUser = JSON.parse(localStorage.getItem('digitalStreetSession'));
+                updateHeaderUI();
+                reRenderActive();
+            }
         }
-    } else if (hasSession && isAdminAuth) {
-        // Handle Admin persistence across refreshes
+    } else if (hasSession && (isAdminAuth || !isPublic)) {
+        // Handle persistence across refreshes
         currentUser = JSON.parse(localStorage.getItem('digitalStreetSession'));
         updateHeaderUI();
         reRenderActive();
     } else {
         // No user and no local session
-        currentUser = null;
-        localStorage.removeItem('digitalStreetSession');
-        
-        // Only redirect if we are on a functional page (Customer/Vendor/Admin)
-        // and clearly not Authenticated.
         if (!isPublic) {
+            currentUser = null;
+            localStorage.removeItem('digitalStreetSession');
             console.warn("Unauthorized access – Redirecting to Home.");
             window.location.href = 'index.html';
         }
@@ -135,26 +135,44 @@ const formatCurrency = (amt) => "₹" + (amt || 0).toFixed(2);
 const generateHoldCode = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 window.initApp = async function() {
-    // 1. Resolve header and visibility immediately based on APP_MODE
-    updateHeaderUI();
-    reRenderActive();
-    
-    // 2. Ensure the mission section (if any) starts hidden if not on index
-    if (window.APP_MODE && window.APP_MODE !== 'WELCOME') {
-        const mission = document.querySelector('.login-info-section');
-        if (mission) mission.style.display = 'none';
-    }
+    try {
+        // 1. Resolve header and visibility immediately based on APP_MODE
+        updateHeaderUI();
+        reRenderActive();
+        
+        // 2. Ensure the mission section (if any) starts hidden if not on index
+        if (window.APP_MODE && window.APP_MODE !== 'WELCOME') {
+            const mission = document.querySelector('.login-info-section');
+            if (mission) mission.style.display = 'none';
+        }
 
-    lucide.createIcons();
-    initFirebaseListeners();
-    initGSAP();
-    setInterval(tickTimers, 1000);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        initFirebaseListeners();
+        initGSAP();
+        setInterval(tickTimers, 1000);
+        
+        // 🚀 Final Force-Show Reveal Fallback (Global)
+        setTimeout(() => {
+            document.querySelectorAll('.reveal > *, .view-section').forEach(el => {
+                if(getComputedStyle(el).opacity === '0' || el.style.opacity === '0') {
+                    gsap.to(el, { opacity: 1, y: 0, duration: 0.5 });
+                }
+            });
+        }, 3000);
+        
+    } catch (err) {
+        console.error("Critical App Init Failure:", err);
+        // Emergency show-all if something fails
+        document.body.style.opacity = '1';
+        document.querySelectorAll('.reveal > *').forEach(e => e.style.opacity = '1');
+    }
 };
 
 // 🎨 GSAP Animation Engine
 function initGSAP() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
         console.warn('GSAP or ScrollTrigger not found, falling back to static view.');
+        document.querySelectorAll('.reveal > *').forEach(e => e.style.opacity = '1');
         return;
     }
     
@@ -165,7 +183,8 @@ function initGSAP() {
         y: -100,
         opacity: 0,
         duration: 1.2,
-        ease: "expo.out"
+        ease: "expo.out",
+        clearProps: "all"
     });
 
     // Global Scroll Reveals (Staggered Children)
@@ -174,11 +193,13 @@ function initGSAP() {
         section.classList.add('ready');
         const children = section.children;
         
-        // If the section is already visible (like on a dashboard/direct page load), 
-        // reveal immediately. Otherwise, use ScrollTrigger.
+        // MANUALLY SET HIDDEN STATE ONLY IF RUNNING GSAP
+        gsap.set(children, { opacity: 0, y: 20 });
+
+        // If the section is already visible, reveal immediately
         if (section.offsetParent !== null && section.getBoundingClientRect().top < window.innerHeight) {
             gsap.to(children, {
-                opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power4.out", clearProps: "all"
+                opacity: 1, y: 0, duration: 1.5, stagger: 0.1, ease: "power4.out", clearProps: "all"
             });
         }
 
@@ -190,21 +211,21 @@ function initGSAP() {
             },
             y: 0,
             opacity: 1,
-            duration: 1,
+            duration: 1.2,
             stagger: 0.15,
             ease: "power4.out",
             clearProps: "all"
         });
     });
 
-    // Safety Fallback: If animations haven't fired after 2.5 seconds, force-reveal everything.
+    // Safety Fallback: Force-reveal everything if animations are stuck.
     setTimeout(() => {
-        const hidden = document.querySelectorAll(".reveal > *:not(.animated)");
-        if (hidden.length > 0) {
-            console.warn("GSAP safety fallback triggered for", hidden.length, "elements.");
-            gsap.to(hidden, { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, clearProps: "all" });
-        }
-    }, 2500);
+        document.querySelectorAll(".reveal > *:not(.animated)").forEach(item => {
+            if (gsap.getProperty(item, "opacity") < 0.1) {
+                gsap.to(item, { opacity: 1, y: 0, duration: 0.5, clearProps: "all" });
+            }
+        });
+    }, 2000);
 }
 
 function animateTransitions() {
@@ -221,6 +242,7 @@ function animateTransitions() {
                     opacity: 1, y: 0,
                     duration: 0.8, stagger: 0.1, 
                     ease: "power3.out",
+                    onScrollTrigger: { trigger: container, start: "top 90%" },
                     onComplete: () => {
                         items.forEach(i => i.classList.add('animated'));
                     }
@@ -367,7 +389,23 @@ window.submitSupportTicket = async function() {
 /* ================= CUSTOMER VIEW ================= */
 function renderCustomerView() {
     const balanceElem = document.getElementById("customer-wallet-balance");
-    if (balanceElem && currentUser) balanceElem.innerText = formatCurrency(currentUser.walletBalance || 0);
+    // Force show the wallet and search bar containers for contrast check
+    const walletCard = document.querySelector('.wallet-card');
+    const searchBar = document.querySelector('.search-container');
+    if (walletCard) {
+        walletCard.style.opacity = '1';
+        walletCard.style.transform = 'translateY(0)';
+    }
+    if (searchBar) {
+        searchBar.style.opacity = '1';
+        searchBar.style.transform = 'translateY(0)';
+    }
+    
+    // Update balance
+    if (balanceElem && currentUser) {
+        balanceElem.innerText = formatCurrency(currentUser.walletBalance || 0);
+        balanceElem.style.color = 'var(--accent-orange)'; // High contrast for balance
+    }
 
     const list = document.getElementById("customer-product-list");
     const ordersList = document.getElementById("customer-orders-list");
@@ -579,10 +617,12 @@ function renderVendorView() {
         `;
     }
 
+    if (!currentUser) return;
+    const vendorEmail = currentUser.email.toLowerCase(); // Case-insensitive handling
+    const myItems = storeItems.filter(i => (i.vendorEmail || '').toLowerCase() === vendorEmail);
     const list = document.getElementById("vendor-product-list");
     if (!list) return;
     list.innerHTML = "";
-    const myItems = storeItems.filter(i => i.vendorEmail === currentUser?.email);
     if(myItems.length === 0) list.innerHTML = "<div style='text-align:center; padding: 2rem; color:var(--text-secondary);'>None listed yet.</div>";
 
     myItems.forEach((item, index) => {
@@ -616,8 +656,11 @@ function renderAdminView() {
     const vendBody = document.getElementById("admin-vendors-table");
     const suppBody = document.getElementById("admin-support-table");
     
-    if(incElem) incElem.innerText = formatCurrency(platformMetrics.totalIncome);
-    if(soldElem) soldElem.innerText = ordersArray.filter(o => o.status === 'COMPLETED').length;
+    // Calculate total revenue from ALL completed orders (includes historical data)
+    const completedOrders = ordersArray.filter(o => o.status === 'COMPLETED');
+    const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.price || 0), 0);
+    if(incElem) incElem.innerText = formatCurrency(totalRevenue);
+    if(soldElem) soldElem.innerText = completedOrders.length;
 
     if(ordBody) {
         // Display latest 5 orders regardless of status

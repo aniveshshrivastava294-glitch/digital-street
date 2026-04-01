@@ -56,12 +56,12 @@
 
         <!-- Hero Section -->
         <div class="hero-section reveal" style="margin-top: 4rem; padding: 0 2rem; margin-bottom: 3rem;">
-            <div class="glass-panel" style="position: relative; height: 350px; display: flex; align-items: center; padding: 3rem; background: linear-gradient(135deg, #1a1a1a 0%, #2d241e 100%); border: none; border-radius: var(--panel-radius);">
-                <div style="position: absolute; inset: 0; background: radial-gradient(circle at bottom right, rgba(192, 140, 93, 0.2) 0%, transparent 70%); border-radius: var(--panel-radius);"></div>
-                <div style="position: relative; z-index: 1; max-width: 400px; color: white;">
-                    <h2 style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem;">FRESH FROM THE STREET</h2>
-                    <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 2rem;">Connecting you with the finest local artisans and fresh neighborhood goods.</p>
-                    <button class="primary-btn huge-btn" style="background: var(--accent-orange); color: white; width: auto; padding: 1rem 2rem;" onclick="document.getElementById('customer-product-list').scrollIntoView({behavior:'smooth'})">Explore Goods</button>
+            <div class="glass-panel" style="position: relative; height: 350px; display: flex; align-items: center; padding: 3rem; background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: var(--panel-radius); overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.03);">
+                <div style="position: absolute; inset: 0; background: radial-gradient(circle at bottom right, rgba(217, 119, 6, 0.1) 0%, transparent 70%); border-radius: var(--panel-radius);"></div>
+                <div style="position: relative; z-index: 1; max-width: 450px; color: #1a1614;">
+                    <h2 style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; color: #000;">FRESH FROM THE STREET</h2>
+                    <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 2rem; color: #333;">Connecting you with the finest local artisans and fresh neighborhood goods.</p>
+                    <button class="primary-btn huge-btn" style="background: var(--accent-orange); color: white; width: auto; padding: 1rem 2.5rem; border: none; font-weight: 700;" onclick="document.getElementById('customer-product-list').scrollIntoView({behavior:'smooth'})">Explore Goods</button>
                 </div>
             </div>
         </div>
@@ -73,10 +73,10 @@
             <section id="customer-view" class="view-section active">
                 
                 <!-- NEW: Customer E-Wallet Card -->
-                <div class="glass-panel wallet-card reveal" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.15)); border: 1px solid rgba(59, 130, 246, 0.3); margin-bottom: 2rem;">
+                <div class="glass-panel wallet-card reveal" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.9); border: 2px solid var(--accent-orange); margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(217, 119, 6, 0.1);">
                     <div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;"><i data-lucide="wallet" style="width:14px; height:14px;"></i> Digital Wallet</div>
-                        <div id="customer-wallet-balance" style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary);">₹0.00</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;"><i data-lucide="wallet" style="width:14px; height:14px;"></i> Digital Wallet Balance</div>
+                        <div id="customer-wallet-balance" style="font-size: 2.5rem; font-weight: 800; color: #1a1614;">₹0.00</div>
                     </div>
                     <button class="primary-btn" style="background: var(--accent-blue);" onclick="openAddFundsModal()">
                         <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Top Up
@@ -84,9 +84,9 @@
                 </div>
 
                 <!-- NEW: Search Bar -->
-                <div class="search-container glass-panel reveal" style="margin-bottom: 2rem;">
-                    <i data-lucide="search" class="search-icon"></i>
-                    <input type="text" id="search-input" placeholder="Search for fresh goods..." oninput="handleSearch(this.value)">
+                <div class="search-container glass-panel reveal" style="margin-bottom: 2rem; background: var(--panel-bg); border: 1px solid var(--panel-border);">
+                    <i data-lucide="search" class="search-icon" style="color: var(--accent-orange);"></i>
+                    <input type="text" id="search-input" placeholder="Search for fresh goods..." oninput="handleSearch(this.value)" style="color: white; background: transparent; border: none; outline: none; width: 100%;">
                 </div>
 
                 <!-- NEW: Offers Banner -->
