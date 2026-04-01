@@ -40,12 +40,19 @@
   100% { background-position: 200% 0; }
 }
 
-.stagger-in > * { opacity: 0; animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.stagger-in > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-in > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-in > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-in > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-in > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-in > * { opacity: 0; animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; animation-fill-mode: both; }
+.stagger-in > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-in > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-in > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-in > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-in > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-in > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-in > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-in > *:nth-child(8) { animation-delay: 0.4s; }
+.stagger-in > *:nth-child(9) { animation-delay: 0.45s; }
+.stagger-in > *:nth-child(10) { animation-delay: 0.5s; }
+/* Fallback: anything beyond nth-child(10) should still be visible */
+.stagger-in > *:nth-child(n+11) { opacity: 1; animation: none; }
 
 /* Base Reset */
 * {
@@ -54,6 +61,10 @@
   padding: 0;
   font-family: var(--font-main);
 }
+
+/* 🛡️ Global Visibility Safety Net: prevent GSAP from permanently hiding elements */
+.view-section { opacity: 1 !important; }
+.app-container { opacity: 1; }
 
 @keyframes meshMove {
   0% { background-position: 0% 0%; }
