@@ -51,7 +51,8 @@
 
 /* 🛡️ Global Visibility Safety Net: prevent GSAP from permanently hiding elements */
 .view-section { opacity: 1 !important; }
-.app-container { opacity: 1; }
+.app-container { opacity: 1 !important; }
+.login-main-wrapper, .login-container, .reveal, .login-info-section { opacity: 1 !important; visibility: visible !important; transform: none !important; }
 
 @keyframes meshMove {
   0% { background-position: 0% 0%; }
