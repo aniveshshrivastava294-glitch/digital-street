@@ -1,40 +1,135 @@
-/* CSS Variables - Premium 3D Edition */
 :root {
-  --bg-color: #fcfaf8; 
-  --panel-bg: rgba(255, 255, 255, 0.75);
-  --panel-border: rgba(255, 255, 255, 0.4);
-  --text-primary: #1a1614; 
-  --text-secondary: #6e645e; 
+  --bg-color: #0d0c0b; /* Deep Obsidian */
+  --panel-bg: rgba(20, 18, 17, 0.95);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #fdfcf0; /* Antique Bone */
+  --text-secondary: rgba(253, 252, 240, 0.85); /* Increased for visibility */
   
-  --accent-blue: #3b82f6;
+  --accent-blue: #3b82f6; 
   --accent-green: #10b981;
-  --accent-orange: #d97706; 
-  --accent-orange-dark: #b45309;
+  --accent-orange: #c08c5d; /* Warm Terracotta */
+  --accent-gold: #fbbf24;
   --accent-red: #ef4444; 
   --accent-purple: #8b5cf6; 
   
   --btn-radius: 14px;
-  --panel-radius: 28px; 
+  --panel-radius: 36px; 
   
   --font-main: 'Outfit', sans-serif;
-  --glass-shadow: 0 10px 40px rgba(45, 36, 30, 0.08); 
-  --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-spring: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --glass-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04); 
 }
-/* JavaScript GSAP Animations handle reveal and stagger (Handled in script.js) */
-
-
-/* Removed fadeInUp animation */
-
-@keyframes floatBreath {
-  0%, 100% { transform: translateY(0) rotate(0deg) translateZ(0); }
-  33% { transform: translateY(-10px) rotate(1deg) translateZ(20px); }
-  66% { transform: translateY(5px) rotate(-1deg) translateZ(-10px); }
+/* Stable Entrance Effects (Motion-only, no Opacity-zero) */
+@keyframes entranceSlide {
+  0% { transform: translateY(10px); }
+  100% { transform: translateY(0); }
 }
 
-@keyframes glassHighlight {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+.entrance-fade {
+  animation: entranceSlide 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 🌐 3D Floating Decorative Elements — Shared across all pages */
+.f3d-wrap {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2;
+  perspective: 600px;
+  animation: f3dFloat ease-in-out infinite;
+}
+@keyframes f3dFloat {
+  0%,100% { transform: translateY(0px); }
+  50%     { transform: translateY(-18px); }
+}
+
+/* Spinning Cube */
+.f3d-cube {
+  width: var(--sz, 34px);
+  height: var(--sz, 34px);
+  background: linear-gradient(145deg, var(--c1, rgba(192,140,93,0.55)), var(--c2, rgba(139,80,30,0.25)));
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 5px;
+  opacity: var(--op, 0.65);
+  animation: cube3dSpin linear infinite var(--spin, 11s);
+  transform-style: preserve-3d;
+  box-shadow:
+    calc(var(--sz, 34px) * 0.24) calc(var(--sz, 34px) * 0.24) 0 rgba(0,0,0,0.2),
+    inset 0 0 18px rgba(255,255,255,0.2);
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
+}
+@keyframes cube3dSpin {
+  0%   { transform: rotateX(0deg)   rotateY(0deg);   }
+  25%  { transform: rotateX(90deg)  rotateY(70deg);  }
+  50%  { transform: rotateX(180deg) rotateY(130deg); }
+  75%  { transform: rotateX(270deg) rotateY(210deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+/* Gradient Sphere / Orb */
+.f3d-orb {
+  width: var(--sz, 48px);
+  height: var(--sz, 48px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 33% 28%,
+    rgba(255,255,255,0.7) 0%,
+    var(--cm, rgba(192,140,93,0.55)) 38%,
+    var(--cd, rgba(100,55,10,0.6)) 100%);
+  opacity: var(--op, 0.6);
+  box-shadow: inset -6px -6px 14px rgba(0,0,0,0.3), 0 8px 24px rgba(192,140,93,0.35);
+  animation: orbPulse ease-in-out infinite var(--pulse, 5s);
+}
+@keyframes orbPulse {
+  0%,100% { box-shadow: inset -6px -6px 14px rgba(0,0,0,0.28), 0 8px 24px rgba(192,140,93,0.18); transform: scale(1); }
+  50%     { box-shadow: inset -6px -6px 14px rgba(0,0,0,0.20), 0 12px 32px rgba(192,140,93,0.32); transform: scale(1.07); }
+}
+
+/* Crystal / Diamond */
+.f3d-crystal {
+  width: var(--sz, 28px);
+  height: var(--sz, 28px);
+  background: linear-gradient(135deg, var(--c1, rgba(251,191,36,0.75)), var(--c2, rgba(192,140,93,0.28)));
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  opacity: var(--op, 0.62);
+  animation: crystalSpin linear infinite var(--spin, 9s);
+  filter: drop-shadow(0 6px 12px rgba(192,140,93,0.5));
+}
+@keyframes crystalSpin {
+  0%   { transform: rotate(0deg)   scale(1); }
+  50%  { transform: rotate(180deg) scale(1.14); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* 💠 Global Simple Aesthetic Animations */
+button, .primary-btn, .login-btn, .role-btn {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease !important;
+}
+
+button:hover, .primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(45, 36, 30, 0.1);
+}
+
+button:active, .primary-btn:active {
+  transform: translateY(1px);
+}
+
+/* 💠 Touch Ripple Effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(192, 140, 93, 0.25);
+  transform: scale(0);
+  animation: ripple-animation 0.6s linear;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
 }
 
 /* Stagger-in: no entrance animation, always visible */
@@ -47,31 +142,60 @@
   margin: 0;
   padding: 0;
   font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+p {
+  line-height: 1.75;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.012em;
+  opacity: 0.9;
+}
+
+h1, h2, h3, h4, label, span, strong, a {
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
 /* 🛡️ Global Visibility Safety Net: prevent GSAP from permanently hiding elements */
-.view-section { opacity: 1 !important; }
-.app-container { opacity: 1 !important; }
-.login-main-wrapper, .login-container, .reveal, .login-info-section { opacity: 1 !important; visibility: visible !important; transform: none !important; }
-
-@keyframes meshMove {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
+.view-section { opacity: 1 !important; visibility: visible !important; }
+.app-container { opacity: 1 !important; visibility: visible !important; }
+.login-main-wrapper { 
+  display: flex !important; 
+  opacity: 1 !important; 
+  perspective: 2000px; /* Enable 3D Context */
+  transform-style: preserve-3d;
 }
+.login-container, .reveal, .login-info-section { opacity: 1 !important; visibility: visible !important; }
+
+
 
 .mesh-bg {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  z-index: -2;
-  background: 
-    radial-gradient(at 10% 10%, rgba(192, 140, 93, 0.15) 0px, transparent 50%),
-    radial-gradient(at 90% 10%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.05) 0px, transparent 50%),
-    radial-gradient(at 10% 90%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
-    --bg-color;
-  background-size: 200% 200%;
-  animation: meshMove 20s ease-in-out infinite;
+  z-index: -4;
+  background: #0d0c0b;
+}
+
+/* ── Radial Background Glow ── */
+.bg-glow {
+  position: fixed; inset: 0; z-index: -3; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 40%, rgba(192,140,93,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 85% 55%, rgba(251,191,36,0.06) 0%, transparent 60%);
 }
 
 body {
@@ -79,7 +203,6 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
-  perspective: 2000px;
 }
 
 #app {
@@ -151,7 +274,6 @@ body {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-fast);
   font-size: 0.9rem;
 }
 .view-switcher button.active {
@@ -190,32 +312,64 @@ main {
 /* Removed fadeIn animation */
 
 .view-section {
-  will-change: opacity, transform;
+  position: relative;
+}
+
+/* 💠 Shining Animation (Sineing) */
+.shine-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-card::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(135deg, 
+    transparent 45%, 
+    rgba(255, 255, 255, 0.05) 48%, 
+    rgba(255, 255, 255, 0.12) 50%, 
+    rgba(255, 255, 255, 0.05) 52%, 
+    transparent 55%);
+  animation: shine-glide 5s infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes shine-glide {
+  0%   { transform: translate(-30%, -30%); }
+  20%, 100% { transform: translate(30%, 30%); }
 }
 
 .glass-panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(42px);
+  -webkit-backdrop-filter: blur(42px);
   border: 1px solid var(--panel-border);
   border-radius: var(--panel-radius);
-  box-shadow: 
-    0 15px 35px rgba(45, 36, 30, 0.05),
-    0 5px 15px rgba(0, 0, 0, 0.02),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  overflow: hidden;
-  transition: var(--transition-spring);
-  transform-style: preserve-3d;
+  box-shadow: var(--glass-shadow);
+  overflow: visible; /* CRITICAL: Prevent clipping 3D depth */
   position: relative;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
+  transform: perspective(2500px) rotateX(0deg) rotateY(0deg);
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .glass-panel:hover {
-  transform: translateY(-10px) rotateX(4deg) rotateY(2deg);
+  transform: perspective(2500px) rotateX(8deg) rotateY(-8deg) translateY(-15px) translateZ(50px);
   box-shadow: 
-    0 40px 70px rgba(45, 36, 30, 0.1),
-    0 20px 30px rgba(45, 36, 30, 0.05),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.6);
-  border-color: rgba(255,255,255,0.8);
+    0 50px 120px rgba(45, 36, 30, 0.2), 
+    0 20px 40px rgba(45, 36, 30, 0.1),
+    inset 0 0 0 2px rgba(192, 140, 93, 0.3);
+  border-color: rgba(192, 140, 93, 0.5);
+}
+
+.glass-panel h1, .glass-panel h2, .glass-panel .primary-btn, .glass-panel .logo-icon-large {
+  transform: translateZ(80px); /* Massive Pop Effect */
 }
 
 /* Grids for multi-column website layout */
@@ -270,13 +424,10 @@ main {
 }
 
 .product-card:hover {
-  transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.product-card {
-  will-change: transform;
-}
+
 
 .product-info-top {
   display: flex;
@@ -328,13 +479,7 @@ main {
 .badge-live { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
 .badge-off { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
 .badge-timer { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
-.badge-flash { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); animation: pulse 2s infinite; }
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-}
+.badge-flash { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
 
 /* Action Buttons */
 .btn-reserve {
@@ -351,11 +496,9 @@ main {
   align-items: center;
   gap: 0.5rem;
   width: 100%;
-  transition: var(--transition-bounce);
 }
 .btn-reserve:hover {
   background: #2563eb;
-  transform: scale(1.02);
 }
 .btn-reserve:disabled {
   background: rgba(255, 255, 255, 0.1);
@@ -405,7 +548,6 @@ main {
   font-weight: 700;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: var(--transition-bounce);
   border: 1px solid var(--panel-border);
   background: white;
   color: var(--text-primary);
@@ -461,7 +603,6 @@ main {
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
-  transition: var(--transition-fast);
   color: white;
   min-width: 120px;
 }
@@ -472,7 +613,7 @@ main {
 .btn-flash { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
 
 .huge-btn:hover {
-  filter: brightness(1.2);
+  opacity: 0.9;
 }
 
 /* Timer Settings Modal Overlay (Inline) */
@@ -530,13 +671,7 @@ main {
 
 /* Removed slideUp animation */
 
-.toast-fade-out {
-  animation: fadeOut 0.3s ease forwards;
-}
 
-@keyframes fadeOut {
-  to { opacity: 0; transform: translateY(-10px); }
-}
 
 /* --- Added Multi-page Layout Overrides --- */
 .logout-btn {
@@ -550,7 +685,6 @@ main {
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  transition: var(--transition-fast);
 }
 .logout-btn:hover {
   background: rgba(239, 68, 68, 0.2);
@@ -585,12 +719,29 @@ main {
   color: var(--accent-purple);
   filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6));
 }
+/* 3D Interactive Login Card */
+/* 3D Interactive Card Restoration */
+.login-container {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+  transform: perspective(1000px) rotateY(-8deg) rotateX(4deg);
+  background: rgba(20, 18, 17, 0.45);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--glass-shadow);
+}
+
+.login-container:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02) translateZ(10px);
+  box-shadow: 0 50px 100px rgba(0,0,0,0.12), 0 0 40px rgba(99, 102, 241, 0.15);
+}
+
 .login-header h1 {
   font-size: 2.5rem;
-  background: linear-gradient(135deg, #a78bfa, #c084fc);
+  background: linear-gradient(135deg, #6366f1, #818cf8);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.2));
 }
 .login-header p {
   color: var(--text-secondary);
@@ -617,11 +768,9 @@ main {
   gap: 1.25rem;
   color: var(--text-primary);
   cursor: pointer;
-  transition: var(--transition-bounce);
   text-align: left;
 }
 .login-btn:hover {
-  transform: translateY(-4px);
   background: rgba(255,255,255,0.05);
 }
 .login-btn i {
@@ -780,36 +929,23 @@ main {
   padding: 0.85rem 1.75rem;
   border-radius: var(--btn-radius);
   font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition-spring);
   border: none;
   position: relative;
   overflow: hidden;
   z-index: 1;
 }
 
-.primary-btn::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: 0.6s;
-  z-index: -1;
-}
+
 
 .primary-btn:hover {
-  transform: translateY(-3px) scale(1.03);
   filter: brightness(1.15);
   box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-.primary-btn:hover::before {
-  left: 100%;
-}
+
 
 .primary-btn:active {
-  transform: translateY(1px) scale(0.98);
+  background: rgba(0,0,0,0.1);
 }
 
 /* Support FAB (Floating Action Button) */
@@ -828,12 +964,7 @@ main {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   z-index: 998;
-  transition: var(--transition-bounce);
-  border: none;
-}
-
-.support-fab:hover {
-  transform: scale(1.1) rotate(5deg);
+  transition: none;
   background: var(--accent-orange);
 }
 
@@ -846,63 +977,50 @@ main {
 .toast-container {
   z-index: 1001; 
 }
-/* Floating Food Decorations */
+/* Floating Food Decorations - Modern Edition */
 .floating-food-container {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none;
-    z-index: -1;
+    z-index: 0; /* Above mesh-bg, but below panels */
     overflow: hidden;
-    perspective: 1200px;
-    transform-style: preserve-3d;
 }
 
-.floating-food {
+.floating-icon {
     position: absolute;
-    color: var(--accent-orange);
-    opacity: 0.15;
-    filter: blur(1px);
-    animation: floatAround 20s infinite linear;
+    opacity: 0.7; /* High visibility for Attic Cream theme */
+    animation: floatIcon 12s infinite ease-in-out, pulseIcon 4s infinite ease-in-out;
+    filter: drop-shadow(0 10px 20px rgba(45, 36, 30, 0.2));
+    pointer-events: none;
+    z-index: 1; /* In front of mesh, behind panels */
 }
 
-@keyframes floatAround {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    33% { transform: translate(100px, 50px) rotate(120deg); }
-    66% { transform: translate(-50px, 150px) rotate(240deg); }
-    100% { transform: translate(0, 0) rotate(360deg); }
+@keyframes pulseIcon {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 0.9; }
 }
 
-@keyframes floatReverse {
-    0% { transform: translate(0, 0) rotate(360deg); }
-    33% { transform: translate(-100px, -50px) rotate(240deg); }
-    66% { transform: translate(50px, -150px) rotate(120deg); }
-    100% { transform: translate(0, 0) rotate(0deg); }
+@keyframes floatIcon {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(30px, -50px) rotate(15deg); }
+    66% { transform: translate(-30px, 30px) rotate(-15deg); }
 }
 
-@keyframes floatSway {
-    0% { transform: translateY(0) translateX(0); }
-    50% { transform: translateY(-50px) translateX(30px); }
-    100% { transform: translateY(0) translateX(0); }
+.toast-fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.f-1 { top: 5%; left: 5%; animation: floatAround 35s infinite linear; }
-.f-2 { top: 15%; right: 5%; animation: floatReverse 40s infinite linear; }
-.f-3 { top: 40%; left: 10%; animation: floatSway 25s infinite ease-in-out; }
-.f-4 { top: 35%; right: 12%; animation: floatAround 45s infinite linear; }
-.f-5 { bottom: 20%; left: 15%; animation: floatReverse 30s infinite linear; }
-.f-6 { bottom: 15%; right: 8%; animation: floatSway 28s infinite ease-in-out; }
-.f-7 { top: 25%; left: 45%; animation: floatAround 50s infinite linear; opacity: 0.1; }
-.f-8 { bottom: 40%; right: 40%; animation: floatReverse 55s infinite linear; opacity: 0.1; }
-.f-9 { top: 60%; left: 5%; animation: floatSway 32s infinite ease-in-out; }
-.f-10 { top: 10%; left: 80%; animation: floatAround 38s infinite linear; }
-.f-11 { bottom: 5%; left: 40%; animation: floatReverse 42s infinite linear; }
-.f-12 { bottom: 45%; left: 85%; animation: floatSway 27s infinite ease-in-out; }
-.f-13 { top: 75%; right: 15%; animation: floatAround 48s infinite linear; }
-.f-14 { top: 50%; right: 5%; animation: floatReverse 33s infinite linear; }
-.f-15 { top: 5%; left: 35%; animation: floatSway 36s infinite ease-in-out; }
+/* Icon Positions */
+.f-1 { top: 5%; left: 5%; animation-delay: 0s; }
+.f-2 { top: 15%; right: 5%; animation-delay: 2s; }
+.f-3 { top: 40%; left: 10%; animation-delay: 1s; }
+.f-4 { top: 35%; right: 12%; animation-delay: 4s; }
+.f-5 { bottom: 20%; left: 15%; animation-delay: 0.5s; }
+.f-6 { bottom: 15%; right: 8%; animation-delay: 3s; }
+.f-7 { top: 25%; left: 45%; animation-delay: 5s; opacity: 0.08; }
+.f-8 { bottom: 40%; right: 40%; animation-delay: 1.5s; opacity: 0.08; }
+
 
 /* Payment Selector Styles */
 .pay-toggle-btn {
@@ -915,7 +1033,7 @@ main {
   padding: 0.5rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: none;
   outline: none;
 }
 
@@ -993,3 +1111,26 @@ main {
   .login-btn { padding: 1rem; }
   .login-btn .btn-text strong { font-size: 1.1rem; }
 }
+/* Forms and Inputs */
+.auth-input, .modal-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--panel-border);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.auth-input::placeholder, .modal-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.input-group label {
+  color: var(--text-secondary);
+}
+.login-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 1.5rem 0;
+  width: 100%;
+}
+. s h i n e - c a r d : : a f t e r   {   d i s p l a y :   n o n e   ! i m p o r t a n t ;   }  
+ 

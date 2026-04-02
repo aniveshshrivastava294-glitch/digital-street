@@ -141,10 +141,7 @@ window.initApp = async function() {
         reRenderActive();
         
         // 2. Ensure the mission section (if any) starts hidden if not on index
-        if (window.APP_MODE && window.APP_MODE !== 'WELCOME') {
-            const mission = document.querySelector('.login-info-section');
-            if (mission) mission.style.display = 'none';
-        }
+
 
         if (typeof lucide !== 'undefined') lucide.createIcons();
         initFirebaseListeners();
@@ -156,13 +153,11 @@ window.initApp = async function() {
     }
 };
 
-// Animations removed for stable visibility
 
 
 // Auto-init for modules
 initApp();
 
-// Premium Mouse Parallax Effect disabled to prevent visibility conflicts
 
 
 /* ================= PROFILE LOGIC ================= */
@@ -215,13 +210,20 @@ window.updateProfile = async function() {
 
 window.logout = function() {
     localStorage.removeItem('adminAuthenticated');
-    signOut(auth).then(() => {
+    localStorage.removeItem('digitalStreetSession');
+    
+    // Resilient logout
+    try {
+        if (typeof signOut === 'function' && auth) {
+            signOut(auth).finally(() => {
+                window.location.href = 'index.html';
+            });
+        } else {
+            window.location.href = 'index.html';
+        }
+    } catch (e) {
         window.location.href = 'index.html';
-    }).catch(() => {
-        // Admin has no Firebase account, just redirect
-        localStorage.removeItem('digitalStreetSession');
-        window.location.href = 'index.html';
-    });
+    }
 }
 
 /* ================= SEARCH LOGIC ================= */
@@ -254,30 +256,17 @@ window.submitSupportTicket = async function() {
 
 /* ================= CUSTOMER VIEW ================= */
 function renderCustomerView() {
-    const balanceElem = document.getElementById("customer-wallet-balance");
-    // Force show the wallet and search bar containers for contrast check
-    const walletCard = document.querySelector('.wallet-card');
-    const searchBar = document.querySelector('.search-container');
-    if (walletCard) {
-        walletCard.style.opacity = '1';
-        walletCard.style.transform = 'translateY(0)';
-    }
-    if (searchBar) {
-        searchBar.style.opacity = '1';
-        searchBar.style.transform = 'translateY(0)';
-    }
-    
-    // Update balance
-    if (balanceElem && currentUser) {
-        balanceElem.innerText = formatCurrency(currentUser.walletBalance || 0);
-        balanceElem.style.color = 'var(--accent-orange)'; // High contrast for balance
-    }
-
     const list = document.getElementById("customer-product-list");
+    const balanceElem = document.getElementById("customer-wallet-balance");
     const ordersList = document.getElementById("customer-orders-list");
     const banner = document.getElementById("offers-banner");
     const bannerContainer = document.getElementById("offers-banner-container");
     if (!list) return;
+
+    // Update Wallet Balance Display
+    if (balanceElem && currentUser) {
+        balanceElem.innerText = formatCurrency(currentUser.walletBalance || 0);
+    }
 
     // Render Products logic (Keep as is)
 
@@ -337,8 +326,8 @@ function renderCustomerView() {
 
         let visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon('package')}" class="product-icon"></i></div>`;
         if (item.visual) {
-            if (item.visual.startsWith('http') || item.visual.startsWith('data:')) visualHTML = `<div class="product-visual-container image-visual"><img src="${item.visual}" class="product-img"></div>`;
-            else visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon(item.visual)}" class="product-icon"></i></div>`;
+            // FORCE ICON ONLY - No Images
+            visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon(item.visual)}" class="product-icon"></i></div>`;
         }
 
         let priceHTML = `<div style="color:var(--accent-orange); font-weight:800; font-size:1.2rem;">${formatCurrency(item.price)}</div>`;
@@ -401,7 +390,7 @@ function renderCustomerView() {
                     : "";
 
                 return `
-                <div class="glass-panel" style="padding: 1.5rem; display:flex; flex-direction:column; justify-content:space-between; border-color: ${isPending ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'}; transition: transform 0.3s ease;">
+                <div class="glass-panel" style="padding: 1.5rem; display:flex; flex-direction:column; justify-content:space-between; border-color: ${isPending ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'};">
                     <div>
                         <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 0.5rem;">
                             <h4 style="margin:0; font-size:1.1rem; font-weight:700;">${order.title}</h4>
@@ -499,8 +488,8 @@ function renderVendorView() {
 
         let visualHTML = `<div class="product-visual-container mini-visual"><i data-lucide="package" class="product-icon"></i></div>`;
         if (item.visual) {
-            if (item.visual.startsWith('http')) visualHTML = `<div class="product-visual-container mini-visual image-visual"><img src="${item.visual}" class="product-img"></div>`;
-            else visualHTML = `<div class="product-visual-container mini-visual"><i data-lucide="${item.visual}" class="product-icon"></i></div>`;
+            // FORCE ICON ONLY
+            visualHTML = `<div class="product-visual-container mini-visual"><i data-lucide="${getValidIcon(item.visual)}" class="product-icon"></i></div>`;
         }
 
         const activeHolds = (item.reservedTokens || []).length;
@@ -632,7 +621,7 @@ window.setPaymentMethod = function(itemId, method) {
     if(cashBtn) cashBtn.classList.toggle('active', method === 'CASH');
 
     if(method === 'WALLET') {
-        const canAfford = (currentUser.walletBalance || 0) >= item.price;
+        const canAfford = currentUser && (currentUser.walletBalance || 0) >= item.price;
         if(buyBtn) {
             buyBtn.disabled = !canAfford;
             buyBtn.style.opacity = canAfford ? '1' : '0.5';

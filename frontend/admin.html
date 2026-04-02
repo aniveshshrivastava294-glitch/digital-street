@@ -3,16 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Platform Analytics - Digital Street</title>
+    <title>Platform Analytics - Neighborhood Market</title>
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
+    <script>
+        window.logout = function() {
+            localStorage.clear();
+            window.location.assign('./index.html');
+        };
+
+        // 💠 Touch Ripple Logic
+        document.addEventListener('mousedown', function(e) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            document.body.appendChild(ripple);
+            const size = 100;
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${e.clientX - size/2}px`;
+            ripple.style.top = `${e.clientY - size/2}px`;
+            ripple.addEventListener('animationend', () => ripple.remove());
+        });
+    </script>
 </head>
 <body>
     <div class="mesh-bg"></div>
-    <div id="app" class="app-container">
+    <div class="bg-glow"></div>
+    <!-- 🌐 3D Floating Elements -->
+    <div class="f3d-wrap" style="top:4%;  left:2%;  animation-duration:8s;  animation-delay:0s;"><div class="f3d-cube" style="--sz:40px; --op:0.65; --spin:12s; --c1:rgba(37,99,235,0.4); --c2:rgba(30,60,180,0.2);"></div></div>
+    <div class="f3d-wrap" style="top:14%; right:3%; animation-duration:10s; animation-delay:1.5s;"><div class="f3d-orb" style="--sz:44px; --op:0.55; --cm:rgba(124,58,237,0.4); --cd:rgba(80,30,160,0.3); --pulse:5s;"></div></div>
+    <div class="f3d-wrap" style="top:28%; left:4%;  animation-duration:7s;  animation-delay:0.7s;"><div class="f3d-crystal" style="--sz:30px; --op:0.6; --spin:9s; --c1:rgba(251,191,36,0.5); --c2:rgba(192,140,93,0.2);"></div></div>
+    <div class="f3d-wrap" style="top:47%; right:2%; animation-duration:9s;  animation-delay:2s;"><div class="f3d-cube" style="--sz:32px; --op:0.58; --spin:15s;"></div></div>
+    <div class="f3d-wrap" style="top:63%; left:2%;  animation-duration:11s; animation-delay:0.4s;"><div class="f3d-orb" style="--sz:38px; --op:0.52; --pulse:6s;"></div></div>
+    <div class="f3d-wrap" style="top:88%; left:8%;  animation-duration:9.5s;animation-delay:3s;"><div class="f3d-crystal" style="--sz:26px; --op:0.58; --spin:11s;"></div></div>
+    <div class="f3d-wrap" style="top:5%;  right:20%;animation-duration:13s; animation-delay:2.5s;"><div class="f3d-cube" style="--sz:28px; --op:0.55; --spin:18s; --c1:rgba(5,150,105,0.4); --c2:rgba(2,100,70,0.2);"></div></div>
+    <div class="f3d-wrap" style="top:92%; right:23%;animation-duration:8s;  animation-delay:1.2s;"><div class="f3d-orb" style="--sz:34px; --op:0.54; --pulse:4s;"></div></div>
+    <div class="f3d-wrap" style="top:36%; right:16%;animation-duration:10s; animation-delay:0.9s;"><div class="f3d-crystal" style="--sz:32px; --op:0.58; --spin:14s;"></div></div>
+    <div class="f3d-wrap" style="top:70%; left:21%; animation-duration:12s; animation-delay:4.5s;"><div class="f3d-cube" style="--sz:36px; --op:0.6; --spin:13s;"></div></div>
+    <div id="app" class="app-container entrance-fade">
         
         <!-- Admin Header -->
         <header class="app-header">
@@ -23,7 +53,7 @@
                     </div>
                     <div>
                         <h1 id="user-display-name" style="font-size: 1.25rem; color: white; margin:0;">Loading...</h1>
-                        <small style="color:rgba(255,255,255,0.7); font-size:0.7rem;">Platform Director</small>
+                        <small style="color:rgba(255,255,255,0.7); font-size:0.7rem;">Neighborhood Director</small>
                     </div>
                 </div>
                 <button class="primary-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 0.85rem;" onclick="logout()">
@@ -32,17 +62,17 @@
             </div>
         </header>
 
-        <main class="stagger-in" style="display: flex; flex-direction: column; gap: 2.5rem; padding-top: 2rem;">
+        <main style="display: flex; flex-direction: column; gap: 2.5rem; padding-top: 2rem;">
             
             <!-- Overall Stats -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-top: 2rem;">
-                <div class="glass-panel reveal" style="padding: 3rem; background: white; border: 1px solid rgba(0,0,0,0.03); border-radius: 40px;">
+                <div class="glass-panel" style="padding: 3rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 40px;">
                     <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: 1px;">Total Platform Revenue</div>
-                    <div id="admin-total-income" style="font-size: 4rem; font-weight: 900; color: var(--accent-orange); letter-spacing: -2px;">₹0.00</div>
+                    <div id="admin-total-income" style="font-size: 4rem; font-weight: 900; color: var(--accent-gold); letter-spacing: -2px;">₹0.00</div>
                 </div>
-                <div class="glass-panel reveal" style="padding: 3rem; background: white; border: 1px solid rgba(0,0,0,0.03); border-radius: 40px;">
+                <div class="glass-panel" style="padding: 3rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 40px;">
                     <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: 1px;">Total Orders Processed</div>
-                    <div id="admin-total-sold" style="font-size: 4rem; font-weight: 900; color: var(--accent-orange); letter-spacing: -2px;">0</div>
+                    <div id="admin-total-sold" style="font-size: 4rem; font-weight: 900; color: var(--accent-gold); letter-spacing: -2px;">0</div>
                 </div>
             </div>
 
@@ -126,6 +156,7 @@
     </div>
 
     <!-- Scripts -->
+    <div id="toast-container" class="toast-container"></div>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script type="module">
         window.APP_MODE = 'ADMIN';

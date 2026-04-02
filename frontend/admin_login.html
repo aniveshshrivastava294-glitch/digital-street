@@ -1,100 +1,383 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Portal - Admin Login</title>
-    <!-- Google Fonts: Outfit -->
+    <title>Enterprise Portal – Digital Street Admin</title>
+    <meta name="description" content="Secure admin portal for Digital Street – the neighborhood marketplace empowering local vendors.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css">
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="./styles.css">
+
     <style>
-        .login-container {
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            padding: 0; /* Remove padding for image bleed */
-            border-radius: 40px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            overflow: hidden; /* For image corners */
-        }
-        
-        .admin-hero-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-bottom: 1px solid var(--panel-border);
+        /* ── Page Reset ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body.login-body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            background: #0f0d0c;
+            overflow: hidden;
+            position: relative;
         }
 
-        .login-form-wrapper {
-            padding: 3rem;
+        /* ── Radial Background Glow ── */
+        .bg-glow {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(ellipse 60% 50% at 20% 50%, rgba(192,140,93,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 80% 50%, rgba(251,191,36,0.07) 0%, transparent 70%);
         }
-        .logo-icon-large {
-            color: var(--accent-orange);
-            width: 64px;
-            height: 64px;
-            margin-bottom: 1.5rem;
+
+        /* ── Main Layout ── */
+        .admin-page-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+            width: 100%;
+            max-width: 960px;
+            padding: 2rem;
         }
-        h1 {
-            font-size: 2rem;
+
+        /* ── Left Info Panel ── */
+        .admin-info-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            min-width: 0;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(251,191,36,0.1);
+            border: 1px solid rgba(251,191,36,0.25);
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            width: fit-content;
+        }
+        .brand-badge span {
+            font-size: 0.75rem;
             font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #fbbf24;
         }
-        .input-group label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+
+        .info-heading {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 900;
+            line-height: 1.05;
+            color: #fdfcf0;
+            text-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
+        .info-heading em {
+            font-style: normal;
+            color: #fbbf24;
+        }
+
+        .info-desc {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: rgba(253,252,240,0.85); /* Increased for visibility */
+            max-width: 400px;
+        }
+
+        /* ── Stat Pills ── */
+        .stat-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 0.85rem 1.25rem;
+        }
+        .stat-pill .sp-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        .stat-pill .sp-text { display: flex; flex-direction: column; gap: 1px; }
+        .stat-pill .sp-val {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fdfcf0;
+        }
+        .stat-pill .sp-lbl {
+            font-size: 0.7rem;
             font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+        }
+
+        /* ── Food Showcase Strip ── */
+        .food-strip {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .food-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            transition: all 0.3s;
+        }
+        .food-chip .fc { font-size: 1.1rem; }
+
+        /* ── Login Card ── */
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            flex-shrink: 0;
+            background: rgba(20,18,17,0.95);
+            border: 1px solid rgba(251,191,36,0.18);
+            border-top: 3px solid #fbbf24;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+            backdrop-filter: blur(40px);
+        }
+
+        .card-header {
+            padding: 2.5rem 2.5rem 0;
+            text-align: center;
+        }
+        .shield-icon-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(192,140,93,0.1));
+            border: 1px solid rgba(251,191,36,0.3);
+            border-radius: 20px;
+            margin-bottom: 1.25rem;
+        }
+        .shield-icon-wrap svg { width: 34px; height: 34px; color: #fbbf24; }
+
+        .card-title {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: #ffffff;
             margin-bottom: 0.5rem;
+            text-shadow: 0 4px 10px rgba(251,191,36,0.2);
+        }
+        .card-subtitle {
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .card-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 1.75rem 2.5rem;
+        }
+
+        .card-form { padding: 0 2.5rem 2.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+        .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .input-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
         }
         .auth-input {
             width: 100%;
             padding: 1rem 1.25rem;
-            border-radius: 16px;
-            border: 1px solid var(--panel-border);
-            background: #fdfaf7;
-            color: var(--text-primary);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.04);
+            color: #ffffff;
             outline: none;
-            transition: 0.3s;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            transition: border-color 0.25s, box-shadow 0.25s;
         }
+        .auth-input::placeholder { color: rgba(255,255,255,0.2); }
         .auth-input:focus {
-            border-color: var(--accent-orange);
-            box-shadow: 0 0 0 4px rgba(192, 140, 93, 0.1);
+            border-color: rgba(251,191,36,0.5);
+            box-shadow: 0 0 0 4px rgba(251,191,36,0.08);
+        }
+
+        .login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            width: 100%;
+            padding: 1.1rem;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #fbbf24, #c08c5d);
+            color: #1a1614;
+            font-size: 1rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 0.5rem;
+            box-shadow: 0 8px 30px rgba(251,191,36,0.25);
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(251,191,36,0.35); }
+        .login-btn:active { transform: translateY(0); }
+        .login-btn svg { width: 18px; height: 18px; }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: rgba(255,255,255,0.7); }
+
+        /* ── Responsive ── */
+        @media (max-width: 780px) {
+            .admin-page-wrapper { flex-direction: column; overflow-y: auto; height: 100vh; align-items: flex-start; }
+            body.login-body { overflow-y: auto; align-items: flex-start; }
+            .admin-info-panel { padding-top: 2rem; }
+            .food-card { display: none; }
         }
     </style>
 </head>
+
 <body class="login-body">
-    <div class="login-container glass-panel" style="max-width: 440px;">
-        <img src="./admin_security_hero_1775021948540.png" alt="Secure Administration" class="admin-hero-img">
-        
-        <div class="login-form-wrapper">
-            <div class="login-header" style="text-align: center; margin-bottom: 2rem;">
-                <i data-lucide="shield-check" class="logo-icon-large"></i>
-                <h1>Admin Access</h1>
-                <p style="color: var(--text-secondary); font-size: 0.95rem;">Enter your secure credentials to access the Digital Street Command Center.</p>
+
+    <!-- Background Glow -->
+    <div class="bg-glow"></div>
+
+    <!-- 🌐 3D Floating Elements -->
+    <div class="f3d-wrap" style="top:5%; left:3%; animation-duration:6s; animation-delay:0s;"><div class="f3d-cube" style="--sz:38px; --op:0.65; --spin:11s;"></div></div>
+    <div class="f3d-wrap" style="top:16%; right:4%; animation-duration:9s; animation-delay:1.5s;"><div class="f3d-orb" style="--sz:52px; --op:0.55; --pulse:5s;"></div></div>
+    <div class="f3d-wrap" style="top:31%; left:4%; animation-duration:7s; animation-delay:0.7s;"><div class="f3d-crystal" style="--sz:30px; --op:0.6; --spin:9s;"></div></div>
+    <div class="f3d-wrap" style="top:47%; right:3%; animation-duration:8s; animation-delay:2.1s;"><div class="f3d-cube" style="--sz:30px; --op:0.58; --spin:14s; --c1:rgba(251,191,36,0.35); --c2:rgba(192,140,93,0.15);"></div></div>
+    <div class="f3d-wrap" style="top:63%; left:3%; animation-duration:10s; animation-delay:0.3s;"><div class="f3d-orb" style="--sz:44px; --op:0.52; --pulse:6s;"></div></div>
+    <div class="f3d-wrap" style="top:79%; right:5%; animation-duration:7.5s; animation-delay:1.2s;"><div class="f3d-crystal" style="--sz:26px; --op:0.6; --spin:7s;"></div></div>
+    <div class="f3d-wrap" style="top:88%; left:7%; animation-duration:8.5s; animation-delay:3s;"><div class="f3d-cube" style="--sz:34px; --op:0.62; --spin:9s;"></div></div>
+    <div class="f3d-wrap" style="top:22%; left:17%; animation-duration:12s; animation-delay:2.5s;"><div class="f3d-orb" style="--sz:36px; --op:0.5; --pulse:7s;"></div></div>
+
+    <!-- ── Main Content ── -->
+    <div class="admin-page-wrapper entrance-fade">
+
+        <!-- Left Info Panel -->
+        <div class="admin-info-panel">
+
+            <div class="brand-badge">
+                <i data-lucide="store" style="width:14px;height:14px;color:#fbbf24;"></i>
+                <span>Digital Street</span>
             </div>
-            
-            <form onsubmit="handleAdminLogin(event)" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <div class="input-group">
-                    <label>Administrator ID (Email)</label>
-                    <input type="email" id="admin-email" class="auth-input" placeholder="admin@admin.com" required autofocus>
+
+            <h1 class="info-heading">
+                Your Neighborhood.<br>
+                <em>Powered by</em><br>
+                Local Goodness.
+            </h1>
+
+            <p class="info-desc">
+                Digital Street is a hyperlocal marketplace that connects fresh produce vendors, artisan bakers, and small business owners directly with their community — no middlemen, just real people and real food. This admin portal gives you full control over vendors, orders, wallets, and platform health.
+            </p>
+
+            <!-- Platform Stats -->
+            <div class="stat-row">
+                <div class="stat-pill">
+                    <span class="sp-icon">🏪</span>
+                    <div class="sp-text">
+                        <span class="sp-val">100%</span>
+                        <span class="sp-lbl">Local Vendors</span>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>Access Password</label>
-                    <input type="password" id="admin-password" class="auth-input" placeholder="••••••••" required>
+                <div class="stat-pill">
+                    <span class="sp-icon">🤝</span>
+                    <div class="sp-text">
+                        <span class="sp-val">Zero</span>
+                        <span class="sp-lbl">Middlemen</span>
+                    </div>
                 </div>
-                
-                <button type="submit" id="admin-login-btn" class="primary-btn huge-btn" style="background: var(--accent-orange); color: white; margin-top: 1rem; width: 100%; justify-content: center;">
-                    <i data-lucide="lock-open"></i> Authenticate & Enter
-                </button>
-                <div style="text-align: center; margin-top: 1rem;">
-                    <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; opacity: 0.7; transition: 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">← Back to Home Page</a>
+                <div class="stat-pill">
+                    <span class="sp-icon">🔒</span>
+                    <div class="sp-text">
+                        <span class="sp-val">Secure</span>
+                        <span class="sp-lbl">Wallet System</span>
+                    </div>
                 </div>
-            </form>
+            </div>
+
+            <!-- Food Category Chips -->
+            <div class="food-strip">
+                <div class="food-chip"><span class="fc">🌾</span> Grains</div>
+                <div class="food-chip"><span class="fc">🥗</span> Greens</div>
+                <div class="food-chip"><span class="fc">🍓</span> Fruits</div>
+                <div class="food-chip"><span class="fc">🧁</span> Bakery</div>
+                <div class="food-chip"><span class="fc">🥛</span> Dairy</div>
+                <div class="food-chip"><span class="fc">🌿</span> Herbs</div>
+                <div class="food-chip"><span class="fc">🧀</span> Artisan</div>
+            </div>
+
+        </div>
+
+        <!-- Right Login Card -->
+        <div class="login-card">
+
+            <div class="card-header">
+                <div class="shield-icon-wrap">
+                    <i data-lucide="shield-check"></i>
+                </div>
+                <h2 class="card-title">Admin Access</h2>
+                <p class="card-subtitle">
+                    Secure portal for platform administrators.<br>
+                    Manage vendors, orders & market health.
+                </p>
+            </div>
+
+            <div class="card-divider"></div>
+
+            <div class="card-form">
+                <form onsubmit="handleAdminLogin(event)" style="display:flex;flex-direction:column;gap:1.25rem;">
+                    <div class="input-group">
+                        <label>Administrator Email</label>
+                        <input type="email" id="admin-email" class="auth-input" placeholder="admin@admin.com" required autofocus>
+                    </div>
+                    <div class="input-group">
+                        <label>Access Password</label>
+                        <input type="password" id="admin-password" class="auth-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" id="admin-login-btn" class="login-btn">
+                        <i data-lucide="lock-open"></i>
+                        Authenticate & Enter
+                    </button>
+                </form>
+                <a href="index.html" class="back-link">← Back to Neighborhood Market</a>
+            </div>
+
         </div>
     </div>
 
@@ -104,26 +387,28 @@
         function handleAdminLogin(e) {
             e.preventDefault();
             const email = document.getElementById('admin-email').value.trim();
-            const pwd = document.getElementById('admin-password').value;
+            const pwd   = document.getElementById('admin-password').value;
 
             if (email === 'admin@admin.com' && pwd === 'Anivesh@123') {
-                const adminUser = { 
-                    name: 'Platform Admin', 
-                    email: 'admin@admin.com', 
-                    role: 'ADMIN', 
-                    walletBalance: 0, 
-                    totalSpent: 0, 
-                    totalGenerated: 0 
+                const adminUser = {
+                    name: 'Platform Admin',
+                    email: 'admin@admin.com',
+                    role: 'ADMIN',
+                    walletBalance: 0,
+                    totalSpent: 0,
+                    totalGenerated: 0
                 };
                 localStorage.setItem('digitalStreetSession', JSON.stringify(adminUser));
                 localStorage.setItem('adminAuthenticated', 'true');
                 window.location.href = "admin.html";
             } else {
-                alert("❌ Incorrect Admin credentials.");
+                alert("❌ Incorrect Admin credentials. Please try again.");
                 document.getElementById('admin-password').value = '';
                 document.getElementById('admin-password').focus();
             }
         }
     </script>
+
+    <div id="toast-container" class="toast-container"></div>
 </body>
 </html>

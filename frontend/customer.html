@@ -3,34 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Street - Marketplace</title>
+    <title>Customer Dashboard - Neighborhood Market</title>
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
+    <script>
+        window.logout = function() {
+            localStorage.clear();
+            window.location.assign('./index.html');
+        };
+
+        // 💠 Touch Ripple Logic
+        document.addEventListener('mousedown', function(e) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            document.body.appendChild(ripple);
+            const size = 100;
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${e.clientX - size/2}px`;
+            ripple.style.top = `${e.clientY - size/2}px`;
+            ripple.addEventListener('animationend', () => ripple.remove());
+        });
+    </script>
 </head>
 <body>
     <div class="mesh-bg"></div>
-    <div id="app" class="app-container">
-        <!-- Decorative Floating Food Icons -->
-        <div class="floating-food-container">
-            <i data-lucide="apple" class="floating-food f-1" style="width: 80px; height: 80px;"></i>
-            <i data-lucide="carrot" class="floating-food f-2" style="width: 100px; height: 100px;"></i>
-            <i data-lucide="coffee" class="floating-food f-3" style="width: 60px; height: 60px;"></i>
-            <i data-lucide="cake" class="floating-food f-4" style="width: 90px; height: 90px;"></i>
-            <i data-lucide="pizza" class="floating-food f-5" style="width: 110px; height: 110px;"></i>
-            <i data-lucide="fish" class="floating-food f-6" style="width: 70px; height: 70px;"></i>
-            <i data-lucide="sandwich" class="floating-food f-7" style="width: 85px; height: 85px;"></i>
-            <i data-lucide="egg" class="floating-food f-8" style="width: 50px; height: 50px;"></i>
-            <i data-lucide="shopping-basket" class="floating-food f-9" style="width: 95px; height: 95px;"></i>
-            <i data-lucide="citrus" class="floating-food f-10" style="width: 75px; height: 75px;"></i>
-            <i data-lucide="cherry" class="floating-food f-11" style="width: 55px; height: 55px;"></i>
-            <i data-lucide="beef" class="floating-food f-12" style="width: 105px; height: 105px;"></i>
-            <i data-lucide="cookie" class="floating-food f-13" style="width: 65px; height: 65px;"></i>
-            <i data-lucide="drumstick" class="floating-food f-14" style="width: 80px; height: 80px;"></i>
-            <i data-lucide="milk" class="floating-food f-15" style="width: 70px; height: 70px;"></i>
-        </div>
+    <div class="bg-glow"></div>
+    <!-- 🌐 3D Floating Elements -->
+    <div class="f3d-wrap" style="top:5%; left:3%; animation-duration:6s; animation-delay:0s;"><div class="f3d-cube" style="--sz:38px; --op:0.65; --spin:11s;"></div></div>
+    <div class="f3d-wrap" style="top:16%; right:4%; animation-duration:9s; animation-delay:1.5s;"><div class="f3d-orb" style="--sz:52px; --op:0.55; --pulse:5s;"></div></div>
+    <div class="f3d-wrap" style="top:31%; left:4%; animation-duration:7s; animation-delay:0.7s;"><div class="f3d-crystal" style="--sz:30px; --op:0.6; --spin:9s;"></div></div>
+    <div class="f3d-wrap" style="top:47%; right:3%; animation-duration:8s; animation-delay:2.1s;"><div class="f3d-cube" style="--sz:30px; --op:0.58; --spin:14s; --c1:rgba(37,99,235,0.4); --c2:rgba(30,60,180,0.2);"></div></div>
+    <div class="f3d-wrap" style="top:63%; left:3%; animation-duration:10s; animation-delay:0.3s;"><div class="f3d-orb" style="--sz:44px; --op:0.52; --cm:rgba(37,99,235,0.5); --cd:rgba(20,50,150,0.5); --pulse:6s;"></div></div>
+    <div class="f3d-wrap" style="top:79%; right:5%; animation-duration:7.5s; animation-delay:1.2s;"><div class="f3d-crystal" style="--sz:26px; --op:0.6; --spin:7s; --c1:rgba(37,99,235,0.65); --c2:rgba(100,150,235,0.2);"></div></div>
+    <div class="f3d-wrap" style="top:88%; left:7%; animation-duration:8.5s; animation-delay:3s;"><div class="f3d-cube" style="--sz:34px; --op:0.62; --spin:9s;"></div></div>
+    <div class="f3d-wrap" style="top:22%; left:17%; animation-duration:12s; animation-delay:2.5s;"><div class="f3d-orb" style="--sz:36px; --op:0.5; --pulse:7s;"></div></div>
+    <div id="app" class="app-container entrance-fade">
+        
         
         <!-- App Navigation Header -->
         <header class="app-header">
@@ -53,13 +64,13 @@
         </header>
 
         <!-- Hero Section -->
-        <div class="hero-section reveal" style="margin-top: 4rem; padding: 0 2rem; margin-bottom: 3rem;">
-            <div class="glass-panel" style="position: relative; height: 350px; display: flex; align-items: center; padding: 3rem; background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: var(--panel-radius); overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.03);">
+        <div class="hero-section" style="margin-top: 4rem; padding: 0 2rem; margin-bottom: 3rem;">
+            <div class="glass-panel" style="position: relative; height: 350px; display: flex; align-items: center; padding: 3rem; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: var(--panel-radius); overflow: hidden; box-shadow: var(--glass-shadow);">
                 <div style="position: absolute; inset: 0; background: radial-gradient(circle at bottom right, rgba(217, 119, 6, 0.1) 0%, transparent 70%); border-radius: var(--panel-radius);"></div>
-                <div style="position: relative; z-index: 1; max-width: 450px; color: #1a1614;">
-                    <h2 style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; color: #000;">FRESH FROM THE STREET</h2>
-                    <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 2rem; color: #333;">Connecting you with the finest local artisans and fresh neighborhood goods.</p>
-                    <button class="primary-btn huge-btn" style="background: var(--accent-orange); color: white; width: auto; padding: 1rem 2.5rem; border: none; font-weight: 700;" onclick="document.getElementById('customer-product-list').scrollIntoView({behavior:'smooth'})">Explore Goods</button>
+                <div style="position: relative; z-index: 1; max-width: 450px; color: var(--text-primary);">
+                    <h2 style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; color: var(--text-primary);">FRESH FROM THE STREET</h2>
+                    <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 2rem; color: var(--text-secondary);">Connecting you with the finest local artisans and fresh neighborhood goods.</p>
+                    <button class="primary-btn huge-btn" style="background: var(--accent-orange); color: white; width: auto; padding: 1rem 2.5rem; border: none; font-weight: 700;" onclick="document.getElementById('customer-product-list').scrollIntoView()">Explore Goods</button>
                 </div>
             </div>
         </div>
@@ -71,10 +82,10 @@
             <section id="customer-view" class="view-section active">
                 
                 <!-- NEW: Customer E-Wallet Card -->
-                <div class="glass-panel wallet-card reveal" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.9); border: 2px solid var(--accent-orange); margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(217, 119, 6, 0.1);">
+                <div class="glass-panel wallet-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border: 2px solid var(--accent-orange); margin-bottom: 2rem;">
                     <div>
                         <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.3rem;"><i data-lucide="wallet" style="width:14px; height:14px;"></i> Digital Wallet Balance</div>
-                        <div id="customer-wallet-balance" style="font-size: 2.5rem; font-weight: 800; color: #1a1614;">₹0.00</div>
+                        <div id="customer-wallet-balance" style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary);">₹0.00</div>
                     </div>
                     <button class="primary-btn" style="background: var(--accent-blue);" onclick="openAddFundsModal()">
                         <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i> Top Up
@@ -82,7 +93,7 @@
                 </div>
 
                 <!-- NEW: Search Bar -->
-                <div class="search-container glass-panel reveal" style="margin-bottom: 2rem; background: var(--panel-bg); border: 1px solid var(--panel-border);">
+                <div class="search-container glass-panel" style="margin-bottom: 2rem; background: var(--panel-bg); border: 1px solid var(--panel-border);">
                     <i data-lucide="search" class="search-icon" style="color: var(--accent-orange);"></i>
                     <input type="text" id="search-input" placeholder="Search for fresh goods..." oninput="handleSearch(this.value)" style="color: white; background: transparent; border: none; outline: none; width: 100%;">
                 </div>
@@ -102,17 +113,17 @@
                     <p>Snag fresh goods from local vendors around you.</p>
                 </div>
                 
-                <div class="product-grid stagger-in" id="customer-product-list">
+                <div class="product-grid" id="customer-product-list">
                     <!-- Products rendered via JS -->
                 </div>
 
                 <!-- NEW: My Orders / Cart Section -->
-                <div id="customer-orders-section" class="stagger-in" style="margin-top: 4rem;">
+                <div id="customer-orders-section" style="margin-top: 4rem;">
                     <div class="view-header" style="margin-bottom: 2rem; border-left: 5px solid var(--accent-blue); padding-left: 1.5rem;">
                         <h2 style="display: flex; align-items: center; gap: 0.75rem; font-size: 2rem;"><i data-lucide="shopping-cart"></i> My Orders</h2>
                         <p>Track your pickups and view your unique OTP codes here.</p>
                     </div>
-                    <div id="customer-orders-list" class="orders-history-grid stagger-in" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
+                    <div id="customer-orders-list" class="orders-history-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
                         <!-- Orders populated via JS -->
                     </div>
                 </div>
@@ -157,8 +168,8 @@
             </div>
             <div style="display: flex; flex-direction: column; gap: 1rem;">
                 <div class="glass-panel" style="padding: 1rem; background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--accent-blue);">
-                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>Need Help?</strong> Contact our 24/7 Digital Street Support team.</p>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="mail" style="width:12px; height:12px;"></i> support@digitalstreet.com</p>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>Need Help?</strong> Contact our 24/7 Neighborhood Support team.</p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="mail" style="width:12px; height:12px;"></i> support@neighborhood.com</p>
                     <p style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="phone" style="width:12px; height:12px;"></i> +91 000 111 2222</p>
                 </div>
                 <div class="input-group">
