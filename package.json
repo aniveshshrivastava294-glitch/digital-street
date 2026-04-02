@@ -8,8 +8,12 @@
     "install-backend": "cd backend && npm install",
     "dev": "cd backend && node server.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.6",
+    "bcryptjs": "^3.0.3"
+  },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

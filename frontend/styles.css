@@ -796,7 +796,7 @@ main {
   align-items: center;
   justify-content: center;
   gap: 4rem;
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
   padding: 2rem;
@@ -806,7 +806,7 @@ main {
 .login-info-section {
   flex: 1;
   color: var(--text-primary);
-  max-width: 500px;
+  max-width: 1100px;
   text-align: left;
 }
 
