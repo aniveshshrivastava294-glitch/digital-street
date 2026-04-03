@@ -619,7 +619,38 @@ main {
 .status-active { color: var(--accent-green); font-weight: 600; }
 
 .vendor-item-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
   gap: 1.25rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vendor-item-card.sold-out {
+  border-color: rgba(239, 68, 68, 0.2);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), var(--panel-bg));
+}
+
+.vendor-item-card.sold-out .mini-visual {
+  filter: grayscale(1) opacity(0.5);
+}
+
+.vendor-item-card.flash-sale-active {
+  border-color: var(--accent-gold);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), var(--panel-bg));
+  box-shadow: 0 20px 40px rgba(251, 191, 36, 0.1), var(--glass-shadow);
+  animation: vendor-flash-glow 3s infinite alternate;
+}
+
+@keyframes vendor-flash-glow {
+  from { border-color: rgba(251, 191, 36, 0.3); }
+  to { border-color: rgba(251, 191, 36, 0.8); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2), var(--glass-shadow); }
+}
+
+.btn-flash-active {
+  background: var(--accent-gold) !important;
+  color: #000 !important;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
 }
 
 .controls-row {

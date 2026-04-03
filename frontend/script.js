@@ -491,7 +491,11 @@ function renderVendorView() {
 
     myItems.forEach((item, index) => {
         const card = document.createElement("div");
-        card.className = `vendor-item-card glass-panel ${item.status !== 'IN_STOCK' ? 'sold-out' : ''}`;
+        const isSoldOut = item.status !== 'IN_STOCK';
+        const isFlashSale = item.flashSaleActive;
+        
+        card.className = `vendor-item-card glass-panel ${isSoldOut ? 'sold-out' : ''} ${isFlashSale ? 'flash-sale-active' : ''}`;
+        
         const isStocked = item.status === 'IN_STOCK';
         let toggleText = isStocked ? "Set Sold Out" : "Set In Stock";
 
@@ -503,7 +507,28 @@ function renderVendorView() {
         const activeHolds = (item.reservedTokens || []).length;
         const btnStyle = activeHolds > 0 ? "background: var(--accent-orange); color: white;" : "opacity:0.3; cursor:not-allowed;";
 
-        card.innerHTML = `<div style="display:flex; gap:1rem; align-items:center;">${visualHTML}<div class="product-info-top" style="flex-direction: column; flex:1;"><h3>${item.title || "Unnamed Product"}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${activeHolds} active</span></div></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock('${item.id}')">${toggleText}</button><button class="huge-btn" onclick="toggleFlashSale('${item.id}')">${item.flashSaleActive ? 'End Flash' : 'Flash Sale'}</button><button class="huge-btn" style="${btnStyle}" ${activeHolds > 0 ? '' : 'disabled'} onclick="${activeHolds > 0 ? `openPickupModal('${item.id}')` : `showNoHoldsToast()`}"><i data-lucide="shield-check"></i> Verify Pickup</button></div>`;
+        let flashBadge = isFlashSale ? `<div style="position:absolute; top:0.75rem; right:0.75rem; z-index:10;"><span class="badge badge-flash"><i data-lucide="zap" style="width:10px; height:10px;"></i> FLASH</span></div>` : "";
+        let soldBadge = isSoldOut ? `<div style="position:absolute; top:0.75rem; left:0.75rem; z-index:10;"><span class="badge badge-sold" style="font-size:0.6rem; padding:0.2rem 0.5rem;">SOLD OUT</span></div>` : "";
+
+        card.innerHTML = `
+            ${flashBadge}
+            ${soldBadge}
+            <div style="display:flex; gap:1rem; align-items:center;">
+                ${visualHTML}
+                <div class="product-info-top" style="flex-direction: column; flex:1;">
+                    <h3>${item.title || "Unnamed Product"}</h3>
+                    <span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${activeHolds} active</span>
+                </div>
+            </div>
+            <div class="controls-row">
+                <button class="huge-btn" onclick="toggleStock('${item.id}')">${toggleText}</button>
+                <button class="huge-btn ${isFlashSale ? 'btn-flash-active' : ''}" onclick="toggleFlashSale('${item.id}')">
+                    ${isFlashSale ? 'End Flash' : 'Flash Sale'}
+                </button>
+                <button class="huge-btn" style="${btnStyle}" ${activeHolds > 0 ? '' : 'disabled'} onclick="${activeHolds > 0 ? `openPickupModal('${item.id}')` : `showNoHoldsToast()`}">
+                    <i data-lucide="shield-check"></i> Verify Pickup
+                </button>
+            </div>`;
         list.appendChild(card);
     });
     if (typeof lucide !== 'undefined') lucide.createIcons();
