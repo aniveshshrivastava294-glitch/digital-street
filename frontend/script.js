@@ -131,7 +131,10 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-const formatCurrency = (amt) => "₹" + (amt || 0).toFixed(2);
+const formatCurrency = (amt) => {
+    const val = parseFloat(amt);
+    return "₹" + (isNaN(val) ? 0 : val).toFixed(2);
+};
 const generateHoldCode = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 const getValidIcon = (name) => {
@@ -271,10 +274,9 @@ function renderCustomerView() {
 
     // Update Wallet Balance Display
     if (balanceElem && currentUser) {
-        balanceElem.innerText = formatCurrency(currentUser.walletBalance || 0);
+        const bal = parseFloat(currentUser.walletBalance);
+        balanceElem.innerText = formatCurrency(isNaN(bal) ? 0 : bal);
     }
-
-    // Render Products logic (Keep as is)
 
     const filteredItems = storeItems.filter(item => {
         const title = (item.title || "").toLowerCase();
@@ -285,51 +287,51 @@ function renderCustomerView() {
 
     const flashSales = storeItems.filter(item => item.flashSaleActive && item.status === 'IN_STOCK');
     if (flashSales.length > 0 && searchQuery === "") {
-        bannerContainer.classList.remove("hidden");
-        banner.innerHTML = "";
-        flashSales.forEach(item => {
-            const div = document.createElement("div");
-            div.className = "banner-item";
-            let visualHTML = `<div class="banner-visual"><i data-lucide="package" class="product-icon"></i></div>`;
-            if (item.visual) {
-                if (item.visual.startsWith('http')) visualHTML = `<div class="banner-visual"><img src="${item.visual}" class="product-img"></div>`;
-                else visualHTML = `<div class="banner-visual"><i data-lucide="${item.visual}" class="product-icon"></i></div>`;
-            }
+        if(bannerContainer) bannerContainer.classList.remove("hidden");
+        if(banner) {
+            banner.innerHTML = "";
+            flashSales.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "banner-item";
+                let visualHTML = `<div class="banner-visual"><i data-lucide="package" class="product-icon"></i></div>`;
+                if (item.visual) {
+                    if (item.visual.startsWith('http')) visualHTML = `<div class="banner-visual"><img src="${item.visual}" class="product-img"></div>`;
+                    else visualHTML = `<div class="banner-visual"><i data-lucide="${getValidIcon(item.visual)}" class="product-icon"></i></div>`;
+                }
 
-            div.innerHTML = `<div class="offer-badge">Sale</div>${visualHTML}<div class="banner-info"><h4 style="margin:0; font-size:0.9rem;">${item.title}</h4><div style="color:var(--accent-orange); font-weight:700;">${formatCurrency(item.price)}</div><small style="color:var(--text-secondary); font-size:0.7rem;">${item.vendorName}</small></div>`;
-            div.onclick = () => {
-                const searchInput = document.getElementById("search-input");
-                if(searchInput) { searchInput.value = item.title; handleSearch(item.title); }
-            };
-            banner.appendChild(div);
-        });
+                div.innerHTML = `<div class="offer-badge">Sale</div>${visualHTML}<div class="banner-info"><h4 style="margin:0; font-size:0.9rem;">${item.title || "Special Offer"}</h4><div style="color:var(--accent-orange); font-weight:700;">${formatCurrency(item.price)}</div><small style="color:var(--text-secondary); font-size:0.7rem;">${item.vendorName || "Active Vendor"}</small></div>`;
+                div.onclick = () => {
+                    const searchInput = document.getElementById("search-input");
+                    if(searchInput) { searchInput.value = item.title; handleSearch(item.title); }
+                };
+                banner.appendChild(div);
+            });
+        }
     } else {
         if(bannerContainer) bannerContainer.classList.add("hidden");
     }
 
     list.innerHTML = "";
     if(filteredItems.length === 0) {
-        list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 3rem; color:var(--text-secondary);">No products found.</div>`;
+        list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 3rem; color:var(--text-secondary);">No products available at the moment.</div>`;
     }
 
     filteredItems.forEach((item, index) => {
         const card = document.createElement("div");
         card.className = "product-card glass-panel";
-        card.className = "product-card glass-panel";
         
         // Find vendor status from vendorsArray
-        const vendor = vendorsArray.find(v => v.email.toLowerCase() === (item.vendorEmail || "").toLowerCase());
+        const vendor = vendorsArray.find(v => (v.email || "").toLowerCase() === (item.vendorEmail || "").toLowerCase());
         const isShopLive = vendor ? (vendor.isLive !== false) : true; // Default to true
         const shopStatusHTML = isShopLive 
             ? `<span class="badge badge-live" style="font-size:0.6rem; padding: 0.1rem 0.4rem;"><div class="status-dot live" style="width:6px; height:6px;"></div> LIVE</span>`
             : `<span class="badge badge-off" style="font-size:0.6rem; padding: 0.1rem 0.4rem;"><div class="status-dot off" style="width:6px; height:6px;"></div> OFF</span>`;
 
-        const vendorContactHTML = `<div style="display:flex; align-items:center; gap:0.4rem; justify-content:center; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${item.vendorName || "Active Vendor"} ${shopStatusHTML}</div>`;
+        const vendorContactHTML = `<div style="display:flex; align-items:center; gap:0.4rem; justify-content:center; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${item.vendorName || "Verified Vendor"} ${shopStatusHTML}</div>`;
 
 
         let visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon('package')}" class="product-icon"></i></div>`;
         if (item.visual) {
-            // FORCE ICON ONLY - No Images
             visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon(item.visual)}" class="product-icon"></i></div>`;
         }
 
@@ -341,9 +343,8 @@ function renderCustomerView() {
             if (!isShopLive) {
                 reserveHTML = `<button class="primary-btn" style="width:100%; justify-content:center; opacity:0.5; background:var(--panel-border);" disabled>SHOP CLOSED</button>`;
             } else {
-                // Payment Method Selector
-                const balance = currentUser?.walletBalance || 0;
-                const canAffordWallet = balance >= item.price;
+                const bal = parseFloat(currentUser?.walletBalance || 0);
+                const canAffordWallet = bal >= parseFloat(item.price || 0);
                 
                 reserveHTML = `
                     <div class="payment-selector" style="display:flex; background:rgba(255,255,255,0.05); border-radius:8px; padding:2px; margin-bottom:0.75rem;">
@@ -355,16 +356,16 @@ function renderCustomerView() {
                 `;
             }
         } else {
-            reserveHTML = `<button class="btn-reserve" style="background:#ddd; color:#999;" disabled>SOLD OUT</button>`;
+            reserveHTML = `<button class="btn-reserve" style="background:rgba(255,255,255,0.05); color:var(--text-secondary);" disabled>SOLD OUT</button>`;
         }
 
         const myTokens = item.reservedTokens ? item.reservedTokens.filter(rt => rt.ownerEmail === currentUser?.email) : [];
         if (myTokens.length > 0) {
             const lastToken = myTokens[myTokens.length - 1];
             const tokenDisplay = `<div class="code-reveal" style="margin-top:1rem;"><h4>Pickup Code</h4><div class="code" style="font-size:1.5rem;">${lastToken.code}</div><button class="primary-btn" style="background:var(--accent-red); margin-top:0.5rem; width:100%; justify-content:center; font-size:0.75rem;" onclick="cancelOrder('${item.id}', '${lastToken.code}')">Cancel & Refund</button></div>`;
-            card.innerHTML = `${visualHTML}<div class="product-info-top"><h3>${item.title}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${tokenDisplay}</div>`;
+            card.innerHTML = `${visualHTML}<div class="product-info-top"><h3>${item.title || "Unnamed Product"}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${tokenDisplay}</div>`;
         } else {
-            card.innerHTML = `${visualHTML}<div class="product-info-top"><h3>${item.title}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${reserveHTML}</div>`;
+            card.innerHTML = `${visualHTML}<div class="product-info-top"><h3>${item.title || "Unnamed Product"}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${reserveHTML}</div>`;
         }
         list.appendChild(card);
     });
@@ -396,11 +397,11 @@ function renderCustomerView() {
                 <div class="glass-panel" style="padding: 1.5rem; display:flex; flex-direction:column; justify-content:space-between; border-color: ${isPending ? 'rgba(59, 130, 246, 0.4)' : 'rgba(255,255,255,0.05)'};">
                     <div>
                         <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 0.5rem;">
-                            <h4 style="margin:0; font-size:1.1rem; font-weight:700;">${order.title}</h4>
+                            <h4 style="margin:0; font-size:1.1rem; font-weight:700;">${order.title || "Product"}</h4>
                             <span style="font-weight:800; color:var(--accent-green); font-size:1rem;">${formatCurrency(order.price)}</span>
                         </div>
                         <div style="font-size:0.8rem; color:var(--text-secondary); line-height:1.4;">
-                            <span style="display:flex; align-items:center; gap:0.3rem;"><i data-lucide="store" style="width:12px; height:12px;"></i> ${order.vendor}</span>
+                            <span style="display:flex; align-items:center; gap:0.3rem;"><i data-lucide="store" style="width:12px; height:12px;"></i> ${order.vendor || "Unknown Vendor"}</span>
                             <span style="display:flex; align-items:center; gap:0.3rem; margin-top:0.2rem;"><i data-lucide="credit-card" style="width:12px; height:12px;"></i> Paid via: <strong style="color:var(--accent-orange); ml-1">${order.paymentMethod || 'WALLET'}</strong></span>
                         </div>
                         ${otpBlock}
@@ -410,7 +411,7 @@ function renderCustomerView() {
             }).join("");
         }
     }
-    lucide.createIcons(); 
+    if (typeof lucide !== 'undefined') lucide.createIcons(); 
 }
 
 /* ================= WALLET ================= */
@@ -475,13 +476,15 @@ function renderVendorView() {
         `;
     }
 
-    if (!currentUser || !currentUser.email) return;
+    if (!currentUser || !currentUser.email) {
+        if(list) list.innerHTML = "<div style='text-align:center; padding: 2rem; color:var(--text-secondary);'>Logging you in...</div>";
+        return;
+    }
     const vendorEmail = currentUser.email.toLowerCase(); // Case-insensitive handling
     const myItems = storeItems.filter(i => (i.vendorEmail || '').toLowerCase() === vendorEmail);
-    const list = document.getElementById("vendor-product-list");
     if (!list) return;
     list.innerHTML = "";
-    if(myItems.length === 0) list.innerHTML = "<div style='text-align:center; padding: 2rem; color:var(--text-secondary);'>None listed yet.</div>";
+    if(myItems.length === 0) list.innerHTML = "<div style='text-align:center; padding: 2rem; color:var(--text-secondary);'>None listed yet. Your products will appear here once added.</div>";
 
     myItems.forEach((item, index) => {
         const card = document.createElement("div");
@@ -489,19 +492,18 @@ function renderVendorView() {
         const isStocked = item.status === 'IN_STOCK';
         let toggleText = isStocked ? "Set Sold Out" : "Set In Stock";
 
-        let visualHTML = `<div class="product-visual-container mini-visual"><i data-lucide="package" class="product-icon"></i></div>`;
+        let visualHTML = `<div class="product-visual-container mini-visual"><i data-lucide="${getValidIcon('package')}" class="product-icon"></i></div>`;
         if (item.visual) {
-            // FORCE ICON ONLY
             visualHTML = `<div class="product-visual-container mini-visual"><i data-lucide="${getValidIcon(item.visual)}" class="product-icon"></i></div>`;
         }
 
         const activeHolds = (item.reservedTokens || []).length;
         const btnStyle = activeHolds > 0 ? "background: var(--accent-orange); color: white;" : "opacity:0.3; cursor:not-allowed;";
 
-        card.innerHTML = `<div style="display:flex; gap:1rem; align-items:center;">${visualHTML}<div class="product-info-top" style="flex-direction: column; flex:1;"><h3>${item.title}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${activeHolds} active</span></div></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock('${item.id}')">${toggleText}</button><button class="huge-btn" onclick="toggleFlashSale('${item.id}')">${item.flashSaleActive ? 'End Flash' : 'Flash Sale'}</button><button class="huge-btn" style="${btnStyle}" ${activeHolds > 0 ? '' : 'disabled'} onclick="${activeHolds > 0 ? `openPickupModal('${item.id}')` : `showNoHoldsToast()`}"><i data-lucide="shield-check"></i> Verify Pickup</button></div>`;
+        card.innerHTML = `<div style="display:flex; gap:1rem; align-items:center;">${visualHTML}<div class="product-info-top" style="flex-direction: column; flex:1;"><h3>${item.title || "Unnamed Product"}</h3><span style="color:var(--text-secondary); margin-bottom: 0.5rem">Holds: ${activeHolds} active</span></div></div><div class="controls-row"><button class="huge-btn" onclick="toggleStock('${item.id}')">${toggleText}</button><button class="huge-btn" onclick="toggleFlashSale('${item.id}')">${item.flashSaleActive ? 'End Flash' : 'Flash Sale'}</button><button class="huge-btn" style="${btnStyle}" ${activeHolds > 0 ? '' : 'disabled'} onclick="${activeHolds > 0 ? `openPickupModal('${item.id}')` : `showNoHoldsToast()`}"><i data-lucide="shield-check"></i> Verify Pickup</button></div>`;
         list.appendChild(card);
     });
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 /* ================= ADMIN VIEW ================= */
@@ -847,9 +849,16 @@ function showToast(msg) {
 }
 
 function reRenderActive() {
-    if(window.APP_MODE === 'CUSTOMER') renderCustomerView();
-    if(window.APP_MODE === 'VENDOR') renderVendorView();
-    if(window.APP_MODE === 'ADMIN') renderAdminView();
+    try {
+        if(window.APP_MODE === 'CUSTOMER') renderCustomerView();
+        if(window.APP_MODE === 'VENDOR') renderVendorView();
+        if(window.APP_MODE === 'ADMIN') renderAdminView();
+    } catch (e) {
+        console.error("Critical rendering error detected. This usually happens when product data is malformed.", e);
+        // Attempt to recover by displaying a message if we are in a product list area
+        const list = document.getElementById("customer-product-list") || document.getElementById("vendor-product-list");
+        if(list) list.innerHTML = `<div style='text-align:center; padding: 2rem; color:var(--accent-red);'>Something went wrong while displaying products. Please contact support.</div>`;
+    }
 }
 
 function tickTimers() {
