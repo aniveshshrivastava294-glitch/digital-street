@@ -411,6 +411,26 @@ main {
     object-fit: cover;
 }
 
+.product-card.sold-out .product-visual-container {
+    filter: grayscale(0.8);
+    opacity: 0.6;
+}
+
+.product-card.sold-out .product-info-top h3 {
+    color: var(--text-secondary);
+}
+
+.price-tag.flash-price {
+    color: #fbbf24;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    animation: price-glow 2s infinite alternate;
+}
+
+@keyframes price-glow {
+    from { text-shadow: 0 0 5px rgba(251, 191, 36, 0.3); }
+    to { text-shadow: 0 0 15px rgba(251, 191, 36, 0.7); }
+}
+
 .product-info-top {
     padding: 1.5rem;
     padding-bottom: 0.5rem;
@@ -474,12 +494,29 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.badge-stock { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
-.badge-sold { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+.badge-stock { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-sold { 
+  background: rgba(220, 38, 38, 0.2); 
+  color: #f87171; 
+  border: 1px solid rgba(220, 38, 38, 0.4); 
+  backdrop-filter: blur(4px);
+}
 .badge-live { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
 .badge-off { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
 .badge-timer { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
-.badge-flash { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+.badge-flash { 
+  background: linear-gradient(135deg, #f59e0b, #d946ef); 
+  color: white; 
+  border: none;
+  box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+  animation: flash-pulse 2s infinite ease-in-out;
+}
+
+@keyframes flash-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+  50% { transform: scale(1.05); opacity: 0.9; filter: brightness(1.2); }
+}
+
 
 /* Action Buttons */
 .btn-reserve {
@@ -1132,5 +1169,4 @@ main {
   margin: 1.5rem 0;
   width: 100%;
 }
-. s h i n e - c a r d : : a f t e r   {   d i s p l a y :   n o n e   ! i m p o r t a n t ;   }  
- 
+.shine-card::after { display: none !important; }

@@ -318,7 +318,7 @@ function renderCustomerView() {
 
     filteredItems.forEach((item, index) => {
         const card = document.createElement("div");
-        card.className = "product-card glass-panel";
+        card.className = `product-card glass-panel ${item.status !== 'IN_STOCK' ? 'sold-out' : ''}`;
         
         // Find vendor status from vendorsArray
         const vendor = vendorsArray.find(v => (v.email || "").toLowerCase() === (item.vendorEmail || "").toLowerCase());
@@ -335,9 +335,11 @@ function renderCustomerView() {
             visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon(item.visual)}" class="product-icon"></i></div>`;
         }
 
-        let priceHTML = `<div style="color:var(--accent-orange); font-weight:800; font-size:1.2rem;">${formatCurrency(item.price)}</div>`;
-        if (item.flashSaleActive) priceHTML = `<div style="display:flex; align-items:center; gap:0.5rem; justify-content:center;"><small style="text-decoration:line-through; color:var(--text-secondary);">${formatCurrency(item.originalPrice)}</small><span style="color:var(--accent-orange); font-weight:800; font-size:1.2rem;">${formatCurrency(item.price)}</span></div>`;
+        let priceHTML = `<div class="price-tag ${item.flashSaleActive ? 'flash-price' : ''}">${formatCurrency(item.price)}</div>`;
+        if (item.flashSaleActive) priceHTML = `<div style="display:flex; align-items:center; gap:0.5rem; justify-content:center;"><small style="text-decoration:line-through; color:var(--text-secondary);">${formatCurrency(item.originalPrice)}</small><span class="price-tag flash-price">${formatCurrency(item.price)}</span></div>`;
         
+        let flashBadge = item.flashSaleActive ? `<div style="position:absolute; top:1rem; right:1rem; z-index:10;"><span class="badge badge-flash"><i data-lucide="zap" style="width:12px; height:12px;"></i> FLASH SALE</span></div>` : "";
+        let soldBadge = item.status !== 'IN_STOCK' ? `<div style="position:absolute; top:1rem; left:1rem; z-index:10;"><span class="badge badge-sold">SOLD OUT</span></div>` : "";
         let reserveHTML = "";
         if (item.status === 'IN_STOCK') {
             if (!isShopLive) {
@@ -363,9 +365,9 @@ function renderCustomerView() {
         if (myTokens.length > 0) {
             const lastToken = myTokens[myTokens.length - 1];
             const tokenDisplay = `<div class="code-reveal" style="margin-top:1rem;"><h4>Pickup Code</h4><div class="code" style="font-size:1.5rem;">${lastToken.code}</div><button class="primary-btn" style="background:var(--accent-red); margin-top:0.5rem; width:100%; justify-content:center; font-size:0.75rem;" onclick="cancelOrder('${item.id}', '${lastToken.code}')">Cancel & Refund</button></div>`;
-            card.innerHTML = `${visualHTML}<div class="product-info-top"><h3>${item.title || "Unnamed Product"}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${tokenDisplay}</div>`;
+            card.innerHTML = `${flashBadge}${soldBadge}${visualHTML}<div class="product-info-top"><h3>${item.title || "Unnamed Product"}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${tokenDisplay}</div>`;
         } else {
-            card.innerHTML = `${visualHTML}<div class="product-info-top"><h3>${item.title || "Unnamed Product"}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${reserveHTML}</div>`;
+            card.innerHTML = `${flashBadge}${soldBadge}${visualHTML}<div class="product-info-top"><h3>${item.title || "Unnamed Product"}</h3>${vendorContactHTML}${priceHTML}</div><div class="reserve-btn-container">${reserveHTML}</div>`;
         }
         list.appendChild(card);
     });
@@ -476,6 +478,7 @@ function renderVendorView() {
         `;
     }
 
+    const list = document.getElementById("vendor-product-list");
     if (!currentUser || !currentUser.email) {
         if(list) list.innerHTML = "<div style='text-align:center; padding: 2rem; color:var(--text-secondary);'>Logging you in...</div>";
         return;
@@ -488,7 +491,7 @@ function renderVendorView() {
 
     myItems.forEach((item, index) => {
         const card = document.createElement("div");
-        card.className = "vendor-item-card glass-panel";
+        card.className = `vendor-item-card glass-panel ${item.status !== 'IN_STOCK' ? 'sold-out' : ''}`;
         const isStocked = item.status === 'IN_STOCK';
         let toggleText = isStocked ? "Set Sold Out" : "Set In Stock";
 
