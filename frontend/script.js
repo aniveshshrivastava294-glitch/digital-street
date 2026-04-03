@@ -134,6 +134,12 @@ onAuthStateChanged(auth, async (user) => {
 const formatCurrency = (amt) => "₹" + (amt || 0).toFixed(2);
 const generateHoldCode = () => Math.floor(1000 + Math.random() * 9000).toString();
 
+const getValidIcon = (name) => {
+    if (!name) return 'package';
+    const map = { 'tulips': 'flower', 'sunflower': 'flower', 'flower-2': 'flower', 'shop': 'store' };
+    return map[name.toLowerCase()] || name || 'package';
+};
+
 window.initApp = async function() {
     try {
         // 1. Resolve header and visibility immediately based on APP_MODE
@@ -319,10 +325,6 @@ function renderCustomerView() {
 
         const vendorContactHTML = `<div style="display:flex; align-items:center; gap:0.4rem; justify-content:center; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${item.vendorName} ${shopStatusHTML}</div>`;
 
-        const getValidIcon = (name) => {
-            const map = { 'tulips': 'flower', 'sunflower': 'flower', 'flower-2': 'flower', 'shop': 'store' };
-            return map[name.toLowerCase()] || name || 'package';
-        };
 
         let visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon('package')}" class="product-icon"></i></div>`;
         if (item.visual) {
