@@ -63,8 +63,8 @@ function initFirebaseListeners() {
         vendorsArray = allUsers.filter(u => u.role === 'VENDOR');
         
         // Sync currentUser if updated in DB
-        if (currentUser) {
-            const fresh = allUsers.find(u => u.email === currentUser.email);
+        if (currentUser && currentUser.email) {
+            const fresh = allUsers.find(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
             if (fresh) {
                 currentUser = { ...fresh };
                 localStorage.setItem('digitalStreetSession', JSON.stringify(currentUser));
@@ -135,7 +135,7 @@ const formatCurrency = (amt) => "₹" + (amt || 0).toFixed(2);
 const generateHoldCode = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 const getValidIcon = (name) => {
-    if (!name) return 'package';
+    if (!name || typeof name !== 'string') return 'package';
     const map = { 'tulips': 'flower', 'sunflower': 'flower', 'flower-2': 'flower', 'shop': 'store' };
     return map[name.toLowerCase()] || name || 'package';
 };
@@ -277,8 +277,9 @@ function renderCustomerView() {
     // Render Products logic (Keep as is)
 
     const filteredItems = storeItems.filter(item => {
-        const matchesSearch = item.title.toLowerCase().includes(searchQuery) || 
-                             item.vendorName.toLowerCase().includes(searchQuery);
+        const title = (item.title || "").toLowerCase();
+        const vendorName = (item.vendorName || "").toLowerCase();
+        const matchesSearch = title.includes(searchQuery) || vendorName.includes(searchQuery);
         return matchesSearch;
     });
 
@@ -317,13 +318,13 @@ function renderCustomerView() {
         card.className = "product-card glass-panel";
         
         // Find vendor status from vendorsArray
-        const vendor = vendorsArray.find(v => v.email === item.vendorEmail);
+        const vendor = vendorsArray.find(v => v.email.toLowerCase() === (item.vendorEmail || "").toLowerCase());
         const isShopLive = vendor ? (vendor.isLive !== false) : true; // Default to true
         const shopStatusHTML = isShopLive 
             ? `<span class="badge badge-live" style="font-size:0.6rem; padding: 0.1rem 0.4rem;"><div class="status-dot live" style="width:6px; height:6px;"></div> LIVE</span>`
             : `<span class="badge badge-off" style="font-size:0.6rem; padding: 0.1rem 0.4rem;"><div class="status-dot off" style="width:6px; height:6px;"></div> OFF</span>`;
 
-        const vendorContactHTML = `<div style="display:flex; align-items:center; gap:0.4rem; justify-content:center; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${item.vendorName} ${shopStatusHTML}</div>`;
+        const vendorContactHTML = `<div style="display:flex; align-items:center; gap:0.4rem; justify-content:center; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${item.vendorName || "Active Vendor"} ${shopStatusHTML}</div>`;
 
 
         let visualHTML = `<div class="product-visual-container"><i data-lucide="${getValidIcon('package')}" class="product-icon"></i></div>`;
@@ -474,7 +475,7 @@ function renderVendorView() {
         `;
     }
 
-    if (!currentUser) return;
+    if (!currentUser || !currentUser.email) return;
     const vendorEmail = currentUser.email.toLowerCase(); // Case-insensitive handling
     const myItems = storeItems.filter(i => (i.vendorEmail || '').toLowerCase() === vendorEmail);
     const list = document.getElementById("vendor-product-list");
@@ -751,8 +752,12 @@ window.saveNewItem = async function() {
 
     const id = Date.now().toString();
     const newItem = { 
-        title: name, vendorEmail: currentUser.email, vendorName: currentUser.shopName || currentUser.name, 
-        vendorPhone: currentUser.phoneNumber || 'Private', price, originalPrice: price, 
+        title: name, 
+        vendorEmail: (currentUser.email || "").toLowerCase(), 
+        vendorName: currentUser.shopName || currentUser.name, 
+        vendorPhone: currentUser.phoneNumber || 'Private', 
+        price, 
+        originalPrice: price, 
         visual, status: 'IN_STOCK', flashSaleActive: false, reservedTokens: [] 
     };
     

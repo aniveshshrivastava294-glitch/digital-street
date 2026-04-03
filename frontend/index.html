@@ -415,7 +415,7 @@
 
             window.handleAuth = async (event, type) => {
                 event.preventDefault();
-                const email = document.getElementById(`${type}-email`).value.trim();
+                const email = document.getElementById(`${type}-email`).value.trim().toLowerCase();
                 const password = document.getElementById(`${type}-password`).value.trim();
 
                 try {
