@@ -46,4 +46,4 @@ Welcome to **Digital Street**, a premium, state-of-the-art marketplace platform 
 
 ---
 
-*Built with ❤️ by Anivesh & Antigravity*
+*Built with ❤️ by Anivesh 
